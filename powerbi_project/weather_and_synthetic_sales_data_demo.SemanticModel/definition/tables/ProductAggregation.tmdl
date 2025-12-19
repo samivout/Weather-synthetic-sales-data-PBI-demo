@@ -1,0 +1,301 @@
+table ProductAggregation
+	lineageTag: 16c4ef73-50b9-421d-827c-0404b3cdeec4
+
+	calculationGroup
+		precedence: 10
+
+		calculationItem None = SELECTEDMEASURE()
+
+		calculationItem 'Sum By Product' = ```
+				
+				Var Categories =
+				    VALUES('D_Product'[product_id])
+				
+				Var CalcByCategory =
+				    ADDCOLUMNS(
+				        Categories,
+				        "MeasureValue", CALCULATE(SELECTEDMEASURE())
+				    )
+				
+				VAR InclusionCheck = SELECTEDMEASURENAME() IN VALUES('Calculation Group Inclusion'[ProductAggregation]) && 
+				                     SELECTEDMEASURENAME() IN VALUES('Aggregation Type Inclusion'[Sum])
+				
+				VAR MeasureEvaluation =
+				    IF(
+				        InclusionCheck,
+				        SUMX(CalcByCategory, [MeasureValue]),
+				        SELECTEDMEASURE()
+				    )
+				    
+				RETURN
+				    MeasureEvaluation
+				```
+
+		calculationItem 'Average By Product' = ```
+				
+				Var Categories =
+				    VALUES('D_Product'[product_id])
+				
+				Var CalcByCategory =
+				    ADDCOLUMNS(
+				        Categories,
+				        "MeasureValue", CALCULATE(SELECTEDMEASURE())
+				    )
+				
+				VAR InclusionCheck = SELECTEDMEASURENAME() IN VALUES('Calculation Group Inclusion'[ProductAggregation]) && 
+				                     SELECTEDMEASURENAME() IN VALUES('Aggregation Type Inclusion'[Average])
+				
+				VAR MeasureEvaluation =
+				    IF(
+				        InclusionCheck,
+				        AVERAGEX(CalcByCategory, [MeasureValue]),
+				        SELECTEDMEASURE()
+				    )
+				    
+				RETURN
+				    MeasureEvaluation
+				```
+
+		calculationItem 'Weighted Average By Product' = ```
+				
+				VAR InclusionCheck = SELECTEDMEASURENAME() IN VALUES('Calculation Group Inclusion'[ProductAggregation]) && 
+				                     SELECTEDMEASURENAME() IN VALUES('Aggregation Type Inclusion'[Average])
+				
+				VAR Categories =
+				    SUMMARIZE(
+				        'F_Sales',
+				        'D_Product'[product_id],
+				        "MeasureValue", SELECTEDMEASURE(),
+				        "Weight", SUM('F_Sales'[sales])
+				    )
+				
+				VAR WeightedAverageEvaluation =
+				    DIVIDE(
+				        SUMX(Categories, [MeasureValue] * [Weight]),
+				        SUMX(Categories, [Weight])
+				    )
+				
+				RETURN
+				    IF(
+				        InclusionCheck,
+				        WeightedAverageEvaluation,
+				        SELECTEDMEASURE()
+				    )
+				```
+
+		calculationItem 'Median By Product' = ```
+				
+				VAR Categories =
+				    VALUES ( 'D_Product'[product_id] )
+				
+				VAR CalcByCategory =
+				    ADDCOLUMNS (
+				        Categories,
+				        "MeasureValue", CALCULATE ( SELECTEDMEASURE () )
+				    )
+				
+				VAR CalcByCategory_NoBlanks =
+				    FILTER ( CalcByCategory, NOT ISBLANK ( [MeasureValue] ) )
+				
+				VAR InclusionCheck =
+				    SELECTEDMEASURENAME () IN VALUES ( 'Calculation Group Inclusion'[ProductAggregation] ) &&
+				    SELECTEDMEASURENAME () IN VALUES ( 'Aggregation Type Inclusion'[Median] )
+				
+				VAR MeasureEvaluation =
+				    IF (
+				        InclusionCheck,
+				        MEDIANX ( CalcByCategory_NoBlanks, [MeasureValue] ),
+				        SELECTEDMEASURE ()
+				    )
+				
+				RETURN
+				    MeasureEvaluation
+				
+				```
+
+		calculationItem 'Weighted Median By Product' = ```
+				
+				
+				VAR InclusionCheck = SELECTEDMEASURENAME() IN VALUES('Calculation Group Inclusion'[ProductAggregation]) && 
+				                     SELECTEDMEASURENAME() IN VALUES('Aggregation Type Inclusion'[Median])
+				
+				Var Categories =
+				    ADDCOLUMNS(
+				        SUMMARIZE(
+				            'F_Sales',
+				            'D_Product'[product_id],
+				            "MeasureValue", SELECTEDMEASURE(),
+				            "Weight", SUM('F_Sales'[sales])
+				        ),
+				        "InnerSort", [MeasureValue]
+				    )
+				
+				VAR TotalWeight =
+				    SUMX(Categories, [Weight])
+				
+				VAR HalfWeight =
+				    TotalWeight / 2
+				
+				Var WeightedTable =
+				    ADDCOLUMNS(
+				        Categories,
+				        "CumulativeWeight",
+				            VAR CurrentValue = [InnerSort]
+				            RETURN
+				                SUMX(
+				                    FILTER(Categories, [InnerSort] <= CurrentValue),
+				                    [Weight]
+				                )
+				    )
+				
+				VAR WeightedEvaluation =
+				    MINX(
+				        FILTER(WeightedTable, [CumulativeWeight] >= HalfWeight),
+				        [InnerSort]
+				    )
+				
+				RETURN
+				    IF(
+				        InclusionCheck,
+				        WeightedEvaluation,
+				        SELECTEDMEASURE()
+				    )
+				```
+
+		calculationItem 'Max By Product' = ```
+				
+				Var Categories =
+				    VALUES('D_Product'[product_id])
+				
+				Var CalcByCategory =
+				    ADDCOLUMNS(
+				        Categories,
+				        "MeasureValue", CALCULATE(SELECTEDMEASURE())
+				    )
+				
+				VAR InclusionCheck = SELECTEDMEASURENAME() IN VALUES('Calculation Group Inclusion'[ProductAggregation]) && 
+				                     SELECTEDMEASURENAME() IN VALUES('Aggregation Type Inclusion'[Max])
+				
+				VAR MeasureEvaluation =
+				    IF(
+				        InclusionCheck,
+				        MAXX(CalcByCategory, [MeasureValue]),
+				        SELECTEDMEASURE()
+				    )
+				    
+				RETURN
+				    MeasureEvaluation
+				```
+
+		calculationItem 'Min By Product' = ```
+				
+				Var Categories =
+				    VALUES('D_Product'[product_id])
+				
+				Var CalcByCategory =
+				    ADDCOLUMNS(
+				        Categories,
+				        "MeasureValue", CALCULATE(SELECTEDMEASURE())
+				    )
+				
+				VAR InclusionCheck = SELECTEDMEASURENAME() IN VALUES('Calculation Group Inclusion'[ProductAggregation]) && 
+				                     SELECTEDMEASURENAME() IN VALUES('Aggregation Type Inclusion'[Min])
+				
+				VAR MeasureEvaluation =
+				    IF(
+				        InclusionCheck,
+				        MINX(CalcByCategory, [MeasureValue]),
+				        SELECTEDMEASURE()
+				    )
+				    
+				RETURN
+				    MeasureEvaluation
+				```
+
+		calculationItem 'Sdev By Product' = ```
+				
+				Var Categories =
+				    VALUES('D_Product'[product_id])
+				
+				Var CalcByCategory =
+				    ADDCOLUMNS(
+				        Categories,
+				        "MeasureValue", CALCULATE(SELECTEDMEASURE())
+				    )
+				
+				VAR InclusionCheck = SELECTEDMEASURENAME() IN VALUES('Calculation Group Inclusion'[ProductAggregation]) && 
+				                     SELECTEDMEASURENAME() IN VALUES('Aggregation Type Inclusion'[Sdev])
+				
+				VAR MeasureEvaluation =
+				    IF(
+				        InclusionCheck,
+				        STDEVX.P(CalcByCategory, [MeasureValue]),
+				        SELECTEDMEASURE()
+				    )
+				    
+				RETURN
+				    MeasureEvaluation
+				```
+
+		calculationItem 'Weighted Sdev By Product' = ```
+				
+				VAR InclusionCheck = SELECTEDMEASURENAME() IN VALUES('Calculation Group Inclusion'[ProductAggregation]) && 
+				                     SELECTEDMEASURENAME() IN VALUES('Aggregation Type Inclusion'[Sdev])
+				
+				Var Categories =
+				    ADDCOLUMNS(
+				        SUMMARIZE(
+				            'F_Sales',
+				            'D_Product'[product_id],
+				            "MeasureValue", SELECTEDMEASURE(),
+				            "Weight", SUM('F_Sales'[sales])
+				        ),
+				        "InnerSort", [MeasureValue]
+				    )
+				
+				VAR TotalWeight =
+				    SUMX(Categories, [Weight])
+				
+				VAR WeightedMean =
+				    DIVIDE(
+				        SUMX(Categories, [Weight] * [MeasureValue]),
+				        TotalWeight
+				    )
+				
+				VAR WeightedEvaluation =
+				    SQRT(
+				        DIVIDE(
+				            SUMX(
+				                Categories,
+				                [Weight] * POWER([MeasureValue] - WeightedMean, 2)
+				            ),
+				            TotalWeight
+				        )
+				    )
+				
+				RETURN
+				    IF(
+				        InclusionCheck,
+				        WeightedEvaluation,
+				        SELECTEDMEASURE()
+				    )
+				```
+
+	column 'Product Aggregation'
+		dataType: string
+		lineageTag: 2f855483-b59c-474b-a43b-7e963f4e6011
+		summarizeBy: none
+		sourceColumn: Name
+		sortByColumn: Ordinal
+
+		annotation SummarizationSetBy = Automatic
+
+	column Ordinal
+		dataType: int64
+		formatString: 0
+		lineageTag: ee1b9fe6-4139-4330-ab2f-cfd555f58c21
+		summarizeBy: sum
+		sourceColumn: Ordinal
+
+		annotation SummarizationSetBy = Automatic
+

@@ -1,0 +1,11 @@
+# Ignore all __pycache__ directories anywhere.
+*__pycache__
+.idea
+# Notebook files are ignored from version control and instead the paired .py files
+# are managed for cleaner version control.
+/scripts/notebooks/.jupytext-sync-ipynb/*
+
+# Ignore PBI data and local settings files.
+**/.pbi/localSettings.json
+**/.pbi/cache.abf
+**/.pbi/editorSettings.json

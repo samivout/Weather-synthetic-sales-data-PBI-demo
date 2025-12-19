@@ -1,0 +1,271 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.4.0/schema.json",
+  "name": "4ecad1320c10da64ab6c",
+  "position": {
+    "x": 75.235154394299286,
+    "y": 13.149643705463177,
+    "z": 1000,
+    "height": 137.67220902612826,
+    "width": 649.88123515439429,
+    "tabOrder": 2000
+  },
+  "visual": {
+    "visualType": "deneb7E15AEF80B9E4D4F8E12924291ECE89A",
+    "query": {
+      "queryState": {
+        "dataset": {
+          "projections": [
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "D_Time"
+                    }
+                  },
+                  "Property": "Hour"
+                }
+              },
+              "queryRef": "DayTimeTable.Hour",
+              "nativeQueryRef": "Hour"
+            },
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "Main_Measures"
+                    }
+                  },
+                  "Property": "Sales Sum"
+                }
+              },
+              "queryRef": "HourlyMeasureDefinitions.SalesSum",
+              "nativeQueryRef": "SalesSum"
+            },
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "Main_Measures"
+                    }
+                  },
+                  "Property": "Sales Aggregation"
+                }
+              },
+              "queryRef": "HourlyMeasureDefinitions.SelectedAtomicMeasure",
+              "nativeQueryRef": "SelectedAtomicMeasure"
+            },
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "Support_Measures"
+                    }
+                  },
+                  "Property": "MaxAbsoluteColorScale"
+                }
+              },
+              "queryRef": "ColorScaleValueTable.MaxAbsoluteColorScale",
+              "nativeQueryRef": "MaxAbsoluteColorScale"
+            }
+          ]
+        }
+      },
+      "sortDefinition": {
+        "sort": [
+          {
+            "field": {
+              "Column": {
+                "Expression": {
+                  "SourceRef": {
+                    "Entity": "D_Time"
+                  }
+                },
+                "Property": "Hour"
+              }
+            },
+            "direction": "Ascending"
+          }
+        ],
+        "isDefaultSort": true
+      }
+    },
+    "objects": {
+      "stateManagement": [
+        {
+          "properties": {
+            "viewportHeight": {
+              "expr": {
+                "Literal": {
+                  "Value": "127.67220902612826D"
+                }
+              }
+            },
+            "viewportWidth": {
+              "expr": {
+                "Literal": {
+                  "Value": "639.8812351543943D"
+                }
+              }
+            }
+          }
+        }
+      ],
+      "vega": [
+        {
+          "properties": {
+            "provider": {
+              "expr": {
+                "Literal": {
+                  "Value": "'vega'"
+                }
+              }
+            },
+            "jsonSpec": {
+              "expr": {
+                "Literal": {
+                  "Value": "'{\n  \"data\": [\n    {\n      \"name\": \"dataset\"\n    }\n  ],\n  \"signals\": [\n    {\n      \"name\": \"tooltip\",\n      \"value\": {},\n      \"on\": [\n        {\"events\": \"rect:pointerover\", \"update\": \"datum\"},\n        {\"events\": \"rect:pointerout\",  \"update\": \"{}\"}\n      ]\n    }\n  ],\n  \"padding\": {\"bottom\": 0, \"top\": 0},\n  \"scales\": [\n    {\n      \"name\": \"xscale\",\n      \"type\": \"band\",\n      \"domain\": {\"data\": \"dataset\", \"field\": \"Hour\"},\n      \"range\": \"width\",\n      \"padding\": 0.1,\n      \"round\": false\n    },\n    {\n      \"name\": \"yscale\",\n      \"domain\": {\"data\": \"dataset\", \"field\": \"Sales Aggregation\"},\n      \"nice\": true,\n      \"range\": \"height\"\n    },\n    {\n      \"name\": \"color\",\n      \"type\": \"linear\",\n      \"domain\": {\"data\": \"dataset\", \"field\": \"MaxAbsoluteColorScale\"},\n      \"range\": {\"scheme\": \"blues\"},\n      \"reverse\": true\n    }\n  ],\n\n  \"axes\": [\n    { \"orient\": \"bottom\", \"scale\": \"xscale\" , \"labels\": false, \"ticks\": false},\n    { \"orient\": \"left\", \"scale\": \"yscale\" , \"tickCount\": 4, \"labelFontSize\": 8, \"title\": \"Sales Agg. By Hour\", \"titleFontSize\": 11}\n  ],\n\n  \"marks\": [\n    {\n      \"type\": \"rect\",\n      \"from\": {\"data\":\"dataset\"},\n      \"encode\": {\n        \"enter\": {\n          \"x\": {\"scale\": \"xscale\", \"field\": \"Hour\"},\n          \"width\": {\"scale\": \"xscale\", \"band\": 1},\n          \"y\": {\"scale\": \"yscale\", \"field\": \"Sales Aggregation\"},\n          \"y2\": {\"scale\": \"yscale\", \"value\": 0},\n          \"tooltip\": {\n              \"signal\": \"{''Hour'': datum[''Hour''], ''Sales Agg.'': format(datum[''Sales Aggregation__highlight''] ?            datum[''Sales Aggregation__highlight''] : datum[''Sales Aggregation''], ''.0f'')}\"\n            },\n          \"fill\": {\"scale\": \"color\", \"field\": \"Sales Aggregation\"},\n          \"opacity\": {\n            \"value\": 0.3\n          }\n\n        }\n      }\n    },\n    {\n      \"type\": \"rect\",\n      \"from\": {\n        \"data\": \"dataset\"\n      },\n      \"encode\": {\n        \"enter\": {\n          \"fill\": {\"scale\": \"color\", \"field\": \"Sales Aggregation\"},\n          \"tooltip\": {\n            \"signal\": \"{''Hour'': datum[''Hour''], ''Sales Agg.'': format(datum[''Sales Aggregation__highlight''] ?          datum[''Sales Aggregation__highlight''] : datum[''Sales Aggregation''], ''.0f'')}\"\n          },\n          \"y\": {\n            \"scale\": \"yscale\",\n            \"field\": \"Sales Aggregation__highlight\"\n          },\n          \"y2\": {\n            \"scale\": \"yscale\",\n            \"value\": 0\n          },\n          \"x\": {\n            \"scale\": \"xscale\",\n            \"field\": \"Hour\"\n          },\n          \"width\": {\n            \"scale\": \"xscale\",\n            \"band\": 1\n          },\n          \"opacity\": [\n            {\n              \"test\": \"datum.__selected__ == ''off''\",\n              \"value\": 0\n            }\n          ]\n        },\n        \"update\": {\n            \"fill\": {\"scale\": \"color\", \"field\": \"Sales Aggregation\"}\n         },\n         \"hover\": {\n           \"fill\": {\"value\": \"cyan\"}\n         }\n      }\n    },\n    {\n      \"type\": \"text\",\n      \"from\": {\"data\": \"dataset\"},\n      \"encode\": {\n        \"enter\": {\n          \"text\": {\"signal\": \"format(datum[''Sales Aggregation__highlight''] != null ? datum[''Sales Aggregation__highlight''] : datum[''Sales Aggregation''], ''.0f'')\"},\n          \"x\": {\"scale\": \"xscale\", \"field\": \"Hour\", \"band\": 0.5},\n          \"y\": {\"scale\": \"yscale\", \"field\": \"Sales Aggregation\", \"offset\":    -3},\n          \"align\": {\"value\": \"center\"},\n          \"baseline\": {\"value\": \"bottom\"},\n          \"fontSize\": {\"value\": 8},\n          \"fill\": {\"value\": \"black\"}\n        }\n      }\n    }\n  ]\n}'"
+                }
+              }
+            },
+            "jsonConfig": {
+              "expr": {
+                "Literal": {
+                  "Value": "'{\n  \"autosize\": {\n    \"contains\": \"padding\",\n    \"type\": \"fit\"\n  }\n}'"
+                }
+              }
+            },
+            "isNewDialogOpen": {
+              "expr": {
+                "Literal": {
+                  "Value": "false"
+                }
+              }
+            },
+            "enableTooltips": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
+                }
+              }
+            },
+            "enableContextMenu": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
+                }
+              }
+            },
+            "enableHighlight": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
+                }
+              }
+            },
+            "enableSelection": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
+                }
+              }
+            },
+            "selectionMaxDataPoints": {
+              "expr": {
+                "Literal": {
+                  "Value": "50D"
+                }
+              }
+            },
+            "version": {
+              "expr": {
+                "Literal": {
+                  "Value": "'6.2.0'"
+                }
+              }
+            }
+          }
+        }
+      ],
+      "editor": [
+        {
+          "properties": {
+            "wordWrap": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
+                }
+              }
+            },
+            "theme": {
+              "expr": {
+                "Literal": {
+                  "Value": "'dark'"
+                }
+              }
+            }
+          }
+        }
+      ],
+      "developer": [
+        {
+          "properties": {
+            "version": {
+              "expr": {
+                "Literal": {
+                  "Value": "'1.8.2.0'"
+                }
+              }
+            }
+          }
+        }
+      ]
+    },
+    "visualContainerObjects": {
+      "background": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "false"
+                }
+              }
+            }
+          }
+        }
+      ],
+      "border": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "false"
+                }
+              }
+            }
+          }
+        }
+      ],
+      "title": [
+        {
+          "properties": {
+            "text": {
+              "expr": {
+                "Literal": {
+                  "Value": "'Sales Agg. By Hour'"
+                }
+              }
+            }
+          }
+        }
+      ]
+    },
+    "drillFilterOtherVisuals": true
+  },
+  "parentGroupName": "26ece38e17204d5d019c"
+}

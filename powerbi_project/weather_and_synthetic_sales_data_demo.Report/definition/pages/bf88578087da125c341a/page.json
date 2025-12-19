@@ -1,0 +1,8 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/page/2.0.0/schema.json",
+  "name": "bf88578087da125c341a",
+  "displayName": "Sales—Weather Correlation",
+  "displayOption": "FitToPage",
+  "height": 720,
+  "width": 1280
+}

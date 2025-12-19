@@ -1,0 +1,42 @@
+table RemoveWeatherDuplicates
+	lineageTag: 0658ac7b-a7f5-463f-8662-69987fd3e517
+
+	calculationGroup
+		precedence: 5
+
+		calculationItem CollapseWeatherDuplicates = ```
+				
+				VAR GroupedTable =
+				    SUMMARIZE(
+				        'F_Sales',
+				        'F_Sales'[location_id],
+				        'F_Sales'[Date],
+				        'F_Sales'[hour],
+				        "WeatherValue", SELECTEDMEASURE()
+				    )
+				RETURN
+				    CALCULATE(
+				        SELECTEDMEASURE(),
+				        KEEPFILTERS(GroupedTable)
+				    )
+				
+				```
+
+	column 'Calculation group column'
+		dataType: string
+		lineageTag: 0db05dfe-e09d-4da2-b0ea-798adb8621a0
+		summarizeBy: none
+		sourceColumn: Name
+		sortByColumn: Ordinal
+
+		annotation SummarizationSetBy = Automatic
+
+	column Ordinal
+		dataType: int64
+		formatString: 0
+		lineageTag: 7e2ab912-1f33-4227-9c77-30be0b00a628
+		summarizeBy: sum
+		sourceColumn: Ordinal
+
+		annotation SummarizationSetBy = Automatic
+

@@ -1,0 +1,38 @@
+[project]
+name = "synda"
+version = "0.1.0"
+description = "Synthetic sales data generation package."
+authors = [
+    {name = "Sami Voutilainen",email = "sami.voutilainen@pengon.fi"}
+]
+readme = "README.md"
+requires-python = ">=3.13"
+dependencies = [
+    "numpy (>=2.3.3,<3.0.0)",
+    "owslib (>=0.34.1,<0.35.0)",
+    "notebook (>=7.4.7,<8.0.0)",
+    "jupytext (>=1.17.3,<2.0.0)",
+    "pandas (>=2.3.3,<3.0.0)",
+    "deltalake (>=1.1.4,<2.0.0)",
+    "pyarrow (>=21.0.0,<22.0.0)",
+]
+
+
+[build-system]
+requires = ["poetry-core>=2.0.0,<3.0.0"]
+build-backend = "poetry.core.masonry.api"
+
+[dependency-groups]
+dev = [
+    "pytest (>=8.4.2,<9.0.0)"
+]
+
+[tool.pytest.ini_options]
+testpaths = [
+    "tests/unit",
+    "tests/integration",
+]
+
+[tool.jupytext.formats]
+"scripts/notebooks/" = "py:percent"
+"scripts/notebooks/.jupytext-sync-ipynb" = "ipynb"

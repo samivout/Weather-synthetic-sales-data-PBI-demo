@@ -1,0 +1,17 @@
+EVALUATE
+	Var Categories =
+	    SUMMARIZE(
+	        'sales_data',
+	        'salesperson_data'[person_id],
+	        "MeasureValue", AVERAGE('sales_data'[sales]),
+	        "Weight", COUNTROWS('sales_data')
+	    )
+
+RETURN
+	//ROW("Ree",
+    //	DIVIDE(
+    //	    SUMX(Categories, [MeasureValue] * [Weight]),
+    //	    SUMX(Categories, [Weight])
+    //	)
+	//)
+	Categories

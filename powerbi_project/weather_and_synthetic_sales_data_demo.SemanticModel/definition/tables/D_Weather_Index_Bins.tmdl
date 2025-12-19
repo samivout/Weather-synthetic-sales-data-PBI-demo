@@ -1,0 +1,48 @@
+table D_Weather_Index_Bins
+	lineageTag: 64dd0a1b-4517-4af5-a46a-4c58c39ebaa5
+
+	column BinID
+		formatString: 0
+		lineageTag: 770b7cde-0b2d-4fc3-8c03-da33601d00e5
+		summarizeBy: none
+		sourceColumn: [Value]
+
+		annotation SummarizationSetBy = Automatic
+
+	column BinStart
+		lineageTag: bf0417e1-a7e9-4e80-93dd-68678c085caa
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [BinStart]
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column BinEnd
+		lineageTag: 0a8d74b8-9548-4141-922e-34006f26b898
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [BinEnd]
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	partition D_Weather_Index_Bins = calculated
+		mode: import
+		source = ```
+				
+				VAR BinCount = 25
+				VAR BinSize  = 1 / BinCount
+				RETURN
+				ADDCOLUMNS (
+				    GENERATESERIES ( 0, BinCount - 1, 1 ),
+				    "BinStart", [Value] * BinSize,
+				    "BinEnd",   ([Value] + 1) * BinSize
+				)
+				
+				```
+
+	annotation PBI_Id = e176fd55cd2a412394822b01320831f6
+

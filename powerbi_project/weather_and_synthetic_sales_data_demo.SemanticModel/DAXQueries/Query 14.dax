@@ -1,0 +1,18 @@
+DEFINE
+    MEASURE 'DailyMeasureDefinitions'[PreviousPeriodValue_SkipBlanks_monthOnly] = VAR CurKey = MAX('DateTable'[YearMonthInteger])
+VAR PrevKey =
+    CALCULATE (
+        MAX('DateTable'[YearMonthInteger]),
+        'DateTable'[YearMonthInteger] < CurKey
+    )
+RETURN
+    CALCULATE (
+        [SumDailyAggregation],
+        KEEPFILTERS('DateTable'),
+        'DateTable'[YearMonthInteger] = PrevKey
+    )
+
+EVALUATE
+    SUMMARIZECOLUMNS(
+        "PreviousPeriodValue_SkipBlanks_monthOnly", [PreviousPeriodValue_SkipBlanks_monthOnly]
+    )

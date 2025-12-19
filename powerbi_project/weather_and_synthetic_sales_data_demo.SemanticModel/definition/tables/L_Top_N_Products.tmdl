@@ -1,0 +1,110 @@
+table L_Top_N_Products
+	lineageTag: 61847fbd-4f75-4377-9c01-f7d968c4af6b
+
+	measure 'Selected TopN' = ```
+			
+			IF(
+			    HASONEVALUE('L_Top_N_Products'[Top N Products]),
+			    VALUES('L_Top_N_Products'[Top N Products]),
+			    5   -- default Top N if nothing selected
+			)
+			
+			```
+		lineageTag: 1009b367-b293-41fa-a15c-15ecacf0525c
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure 'Product TopN Flag' = ```
+			
+			VAR TopNCount = [Selected TopN]
+			
+			-- Rank products ignoring blanks
+			VAR ProductRank =
+			    RANKX(
+			        FILTER(
+			            ALL('D_Product'),
+			            [Sales Aggregation] <> BLANK()
+			        ),
+			        [Sales Aggregation],
+			        ,
+			        DESC,
+			        DENSE
+			    )
+			
+			RETURN
+			IF(
+			    ProductRank <= TopNCount,
+			    1,
+			    0
+			)
+			
+			```
+		lineageTag: b39e90d4-cd3f-4b9f-ad53-f785528b205d
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure 'Sales Aggregation TopN' = ```
+			
+			VAR TopNCount = [Selected TopN]
+			VAR SelectedProduct = SELECTEDVALUE('D_Product'[Product])
+			
+			-- 1. Create the Top N product table
+			VAR RankedProducts =
+			    TOPN(
+			        TopNCount,
+			        FILTER(
+			            ALL('D_Product'),
+			            [Sales Aggregation] <> BLANK()
+			        ),
+			        [Sales Aggregation],
+			        DESC
+			    )
+			
+			-- 2. Check if the current product is in the Top N
+			VAR IsTopN =
+			    CONTAINS(
+			        RankedProducts,
+			        'D_Product'[Product],
+			        SelectedProduct
+			    )
+			
+			-- 3. Return Sales Aggregation for Top N, else sum the rest as "Other"
+			RETURN
+			IF(
+			    ISBLANK([Sales Aggregation]),
+			    BLANK(),
+			    IF(
+			        IsTopN,
+			        [Sales Aggregation],
+			        CALCULATE(
+			            [Sales Aggregation],
+			            EXCEPT(
+			                ALL('D_Product'),
+			                RankedProducts
+			            )
+			        )
+			    )
+			)
+			
+			```
+		lineageTag: bd16eba9-b60a-4664-aef1-5520e579e228
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column 'Top N Products'
+		formatString: 0
+		lineageTag: 90bbd4f0-621c-4e61-8ac2-62b3c7805525
+		summarizeBy: sum
+		sourceColumn: [Value]
+
+		annotation SummarizationSetBy = Automatic
+
+	partition L_Top_N_Products = calculated
+		mode: import
+		source = ```
+				GENERATESERIES(1, 20, 1)
+				
+				```
+
+	annotation PBI_Id = f23675608d07447cb4300c23552275b9
+

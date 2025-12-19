@@ -1,0 +1,72 @@
+table D_Location
+	lineageTag: 236b06f5-8530-4ee1-8058-a5e6a66aec62
+
+	column location_id
+		dataType: int64
+		formatString: 0
+		lineageTag: 55d41871-967a-4c59-9436-73af9211238a
+		summarizeBy: none
+		sourceColumn: location_id
+
+		annotation SummarizationSetBy = Automatic
+
+	column Location
+		dataType: string
+		lineageTag: c03acff5-f9b9-4f6c-b2a7-98a121a7fff1
+		summarizeBy: none
+		sourceColumn: Location
+
+		annotation SummarizationSetBy = Automatic
+
+	column open_hours_start
+		dataType: int64
+		formatString: 0
+		lineageTag: a94850a2-caa0-4795-844c-bb11b3a87145
+		summarizeBy: sum
+		sourceColumn: open_hours_start
+
+		annotation SummarizationSetBy = Automatic
+
+	column open_hours_end
+		dataType: int64
+		formatString: 0
+		lineageTag: dcb1dadb-fc6c-4c1a-b020-75285e0049fd
+		summarizeBy: sum
+		sourceColumn: open_hours_end
+
+		annotation SummarizationSetBy = Automatic
+
+	column open_days_start
+		dataType: int64
+		formatString: 0
+		lineageTag: a85ffdb1-1190-47c3-a940-868df6736db5
+		summarizeBy: sum
+		sourceColumn: open_days_start
+
+		annotation SummarizationSetBy = Automatic
+
+	column open_days_end
+		dataType: int64
+		formatString: 0
+		lineageTag: 74006433-2918-492c-8a9c-bdff046acc17
+		summarizeBy: sum
+		sourceColumn: open_days_end
+
+		annotation SummarizationSetBy = Automatic
+
+	partition D_Location = m
+		mode: import
+		source =
+				let
+				    Source = Parquet.Document(File.Contents("file:///C:/dev/data/delta/test_location_data_latest.parquet"), [Compression=null, LegacyColumnNameEncoding=false, MaxDepth=null]),
+				    #"Removed Columns" = Table.RemoveColumns(Source,{"sales_max"}),
+				    #"Renamed Columns" = Table.RenameColumns(#"Removed Columns",{{"location_name", "Location"}})
+				in
+				    #"Renamed Columns"
+
+	changedProperty = Name
+
+	annotation PBI_NavigationStepName = Navigation
+
+	annotation PBI_ResultType = Table
+

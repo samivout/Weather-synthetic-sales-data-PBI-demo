@@ -1,0 +1,67 @@
+table 'Aggregation Type Inclusion'
+	lineageTag: 3c4d166c-a876-406f-aa6d-801ad3ca133c
+
+	column Sum
+		dataType: string
+		lineageTag: 8426709c-e7d7-47ed-b5b1-0e7b01c2c843
+		summarizeBy: none
+		sourceColumn: Sum
+
+		annotation SummarizationSetBy = Automatic
+
+	column Average
+		dataType: string
+		lineageTag: 3033869e-54be-4b12-ad50-c62a32de4e98
+		summarizeBy: none
+		sourceColumn: Average
+
+		annotation SummarizationSetBy = Automatic
+
+	column Median
+		dataType: string
+		lineageTag: e3801069-c2f4-4592-8fdd-5d040116e5ec
+		summarizeBy: none
+		sourceColumn: Median
+
+		annotation SummarizationSetBy = Automatic
+
+	column Max
+		dataType: string
+		lineageTag: f4ee9bde-a89f-4351-bf7c-e4c2c7085fac
+		summarizeBy: none
+		sourceColumn: Max
+
+		annotation SummarizationSetBy = Automatic
+
+	column Min
+		dataType: string
+		lineageTag: 0f1c2d46-1958-4f5c-ad83-fdcb0d07ba7a
+		summarizeBy: none
+		sourceColumn: Min
+
+		annotation SummarizationSetBy = Automatic
+
+	column Sdev
+		dataType: string
+		lineageTag: 96ad43bb-1ffa-45df-a125-a968408f218e
+		summarizeBy: none
+		sourceColumn: Sdev
+
+		annotation SummarizationSetBy = Automatic
+
+	partition 'Aggregation Type Inclusion' = m
+		mode: import
+		source =
+				let
+				    Source = Excel.Workbook(File.Contents("C:\dev\Samin_PBI_demo\powerbi_project\AggregationTypeInclusionTable.xlsx"), null, true),
+				    Taulukko1_Table = Source{[Item="Taulukko1",Kind="Table"]}[Data],
+				    #"Changed Type" = Table.TransformColumnTypes(Taulukko1_Table,{{"Sum", type text}, {"Average", type text}, {"Median", type text}, {"Max", type text}, {"Min", type text}, {"Sdev", type text}})
+				in
+				    #"Changed Type"
+
+	changedProperty = Name
+
+	annotation PBI_NavigationStepName = Navigation
+
+	annotation PBI_ResultType = Table
+

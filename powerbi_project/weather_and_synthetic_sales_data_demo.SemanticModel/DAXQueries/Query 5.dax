@@ -1,0 +1,858 @@
+DEFINE
+    MEASURE 'HourlyMeasureDefinitions'[TotalRevenue] = CALCULATE(
+    SUMX(
+        'sales_data',
+        'sales_data'[sales] * RELATED('product_data'[product_price])
+    )
+)
+    MEASURE 'HourlyMeasureDefinitions'[SalesMean] = // Computes the mean hourly sales across recorded hours, i.e. only open hours.
+AVERAGE(sales_data[sales])
+    MEASURE 'HourlyMeasureDefinitions'[WeatherIndexMeanByHour] = // Computes the mean weather index by the hours in the filter context.
+AVERAGEX(
+    VALUES('DayTimeTable'[Hour]),
+    CALCULATE(
+        [WeatherIndexMean]
+    )
+)
+    MEASURE 'HourlyMeasureDefinitions'[NormalizedMeanDailySales] = DIVIDE(
+    [SalesMean],
+    [SalesMeanMaxByHour]
+)
+    MEASURE 'HourlyMeasureDefinitions'[SalesMeanMaxByHour] = MAXX(
+    ALLSELECTED('DayTimeTable'[Hour]),
+    [SalesMean]
+)
+    MEASURE 'HourlyMeasureDefinitions'[SalesSumAggregationVersion] = // Computes the sum of all hourly sales.
+CALCULATE(
+    SUM(sales_data[sales]),
+    LocationAggregation[Location Aggregation] = SELECTEDVALUE(LocationAggregation[Location Aggregation]),
+    DayLevelAggregationTypeGroup[AggregationType] = SELECTEDVALUE(DayLevelAggregationTypeGroup[AggregationType])
+)
+    MEASURE 'HourlyMeasureDefinitions'[SalesMeanAllHoursByHour] = // Computes the mean hourly sales across all hours of the day within filter context, 
+AVERAGEX(
+    VALUES('DayTimeTable'[Hour]),
+    CALCULATE(
+        [SalesMean]
+    )
+)
+    MEASURE 'HourlyMeasureDefinitions'[SalesSumAggregationOverHours] = CALCULATE(
+    [SalesSumAggregationVersion],
+    DayLevelAggregationTypeGroup[AggregationType] = SELECTEDVALUE( DayLevelAggregationTypeGroup[AggregationType] )
+)
+    MEASURE 'HourlyMeasureDefinitions'[WeatherIndexMean] = AVERAGE('sales_data'[weather_index])
+    MEASURE 'HourlyMeasureDefinitions'[HourOfSaleMean] = DIVIDE(
+        SUMX(
+            'sales_data',
+            'sales_data'[Hour] * 'sales_data'[sales]
+        ),
+        SUM('sales_data'[sales])
+)
+    MEASURE 'HourlyMeasureDefinitions'[SalesMedian] = MEDIAN(sales_data[sales])
+    MEASURE 'HourlyMeasureDefinitions'[SalesSumMedianByHour] = VAR HourTable = VALUES('DayTimeTable'[Hour])
+RETURN
+MEDIANX(
+    HourTable,
+    CALCULATE([SalesSumAggregationVersion])
+)
+    MEASURE 'HourlyMeasureDefinitions'[SalesSum] = SUM(sales_data[sales])
+    MEASURE 'HourlyMeasureDefinitions'[SalesSumByHour] = SUMX(
+    SUMMARIZE(
+        'sales_data',
+        'DayTimeTable'[Hour],
+        "Sum", SUM(sales_data[sales])
+    ),
+    [Sum]
+)
+    MEASURE 'HourlyMeasureDefinitions'[SalesMeanByHour] = SUMX(
+    SUMMARIZE(
+        'sales_data',
+        'DayTimeTable'[Hour],
+        "Sum", AVERAGE(sales_data[sales])
+    ),
+    [Sum]
+)
+    MEASURE 'HourlyMeasureDefinitions'[SalesMeanByHour2] = AVERAGEX(
+    SUMMARIZE(
+        'sales_data',
+        'DateTable'[Date],
+        "Sum", [SelectedHourlySalesAggregation]
+    ),
+    [Sum]
+)
+    MEASURE 'HourlyMeasureDefinitions'[SelectedHourlySalesAggregation] = VAR SelectedAgg = SELECTEDVALUE(AggregationType[Aggregation], "Average")
+VAR ComputedValue = SWITCH(
+    SelectedAgg,
+    "Average", AVERAGE('sales_data'[sales]),
+    "Median", MEDIAN('sales_data'[sales]),
+    "Sum", SUM('sales_data'[sales]),
+    SUM('sales_data'[sales])  // Default fallback
+)
+RETURN
+ComputedValue
+    MEASURE 'HourlyMeasureDefinitions'[ChainedSummarization] = VAR HourlyByLocation =
+    SUMMARIZE(
+        sales_data,
+        'DayTimeTable'[Hour],
+        'location_data'[location_name],
+        "HourlySum", SUM(sales_data[sales])
+    )
+
+VAR HourlyAcrossLocations =
+    SUMMARIZE(
+        HourlyByLocation,
+        'DayTimeTable'[Hour],
+        "LocationSum", SUMX(HourlyByLocation, [HourlySum])
+    )
+
+RETURN
+SUMX(HourlyAcrossLocations, [LocationSum])
+    MEASURE 'HourlyMeasureDefinitions'[ChainedSummarization2] = VAR HourlyByLocation =
+    SUMMARIZE(
+        sales_data,
+        'DayTimeTable'[Hour],
+        'location_data'[location_name],
+        "HourlySum", SUM(sales_data[sales])
+    )
+
+RETURN
+SUMX(HourlyByLocation, [HourlySum])
+    MEASURE 'HourlyMeasureDefinitions'[SalesSumMatrixFormat] = [SalesSum]
+    MEASURE 'HourlyMeasureDefinitions'[LogSalesSum] = VAR Initial = [SalesSum]
+RETURN
+    IF(Initial <= 1, 0, LOG10(Initial))
+    MEASURE 'HourlyMeasureDefinitions'[SalesSumCoalesced] = COALESCE([SalesSum], 0)
+    MEASURE 'HourlyMeasureDefinitions'[SalesSumCoalescedMatrixFormat] = COALESCE([SalesSum], 0)
+    MEASURE 'DailyMeasureDefinitions'[SumDailySales] = SUMX(
+    VALUES('DateTable'[Date]),
+    CALCULATE(
+        [SalesSumAggregationVersion],
+        ALL('DayTimeTable'[Hour])
+    )
+)
+    MEASURE 'DailyMeasureDefinitions'[MeanDailySalesOpenOnly] = // Computes the mean sales across the days within filter context, while aggregating hour-level sales into a sum
+AVERAGEX(
+    VALUES('sales_data'[Date]),
+    CALCULATE(
+        [SalesSumAggregationVersion],
+        ALL('DayTimeTable'[Hour])        -- ignore hour filter
+    )
+)
+    MEASURE 'DailyMeasureDefinitions'[MeanDailyWeatherIndex] = AVERAGEX(
+    VALUES('sales_data'[Date]),
+    CALCULATE(
+        AVERAGE('sales_data'[weather_index]),
+        ALL('sales_data'[Hour])        -- ignore hour filter
+    )
+)
+    MEASURE 'DailyMeasureDefinitions'[MeanSalesPerLocationAvgNormalized] = Var MaxValue = [CrossLocationMaxOfMeanSales]
+Var MinValue = [CrossLocationMinOfMeanSales]
+RETURN
+    DIVIDE([CrossLocationMeanOfMeanSales] - MinValue, MaxValue - MinValue)
+    MEASURE 'DailyMeasureDefinitions'[MeanDailySalesAllDays] = // Computes the mean sales across the days within filter context, while aggregating hour-level sales into a sum
+AVERAGEX(
+    VALUES('DateTable'[Date]),
+    CALCULATE(
+        [SalesSumAggregationVersion],
+        ALL('DayTimeTable'[Hour])        -- ignore hour filter
+    )
+)
+    MEASURE 'DynamicTitleDefinitions'[DrillThroughTitle] = "Details for " & SELECTEDVALUE('location_data'[location_name], "Unknown Location")
+    MEASURE 'DynamicTitleDefinitions'[DrillThroughTitlePerson] = "Details for " & SELECTEDVALUE('salesperson_data'[person_name], "Unknown Person") & " at " & SELECTEDVALUE('location_data'[location_name], "Unknown Location")
+    MEASURE 'DynamicTitleDefinitions'[SalespersonLocationName] = CALCULATE(
+    SELECTEDVALUE('location_data'[location_name]),
+    USERELATIONSHIP('salesperson_data'[location_id], 'location_data'[location_id])
+)
+    MEASURE 'DynamicTitleDefinitions'[HourMatrixVersion] = VAR ValueToFormat = VALUES('DayTimeTable'[Hour])
+RETURN
+    FORMAT(ValueToFormat, "00:00")
+    MEASURE 'DynamicTitleDefinitions'[NumberOfEventsInRangeAbsolute] = VAR OriginalContext =
+    CALCULATE(
+        COUNTROWS('sales_data'),
+        REMOVEFILTERS(DateAggregation[Date Aggregation]),
+        REMOVEFILTERS(LocationAggregation[Location Aggregation])
+    )
+RETURN
+OriginalContext
+    MEASURE 'DynamicTitleDefinitions'[NumberOfEventsInRangeRelative] = VAR Denominator =
+    CALCULATE(
+        [NumberOfEventsInRangeAbsolute], // Clear just the filters you want to normalize over:
+        ALL('sales_data')
+    )
+RETURN
+DIVIDE([NumberOfEventsInRangeAbsolute], Denominator)
+    MEASURE 'DynamicTitleDefinitions'[SelectedHourlyAggregation] = SELECTEDVALUE( DayLevelAggregationTypeGroup[AggregationType] )
+    MEASURE 'SalesWeatherCorrelationTable'[sales average per Date] = AVERAGEX(
+	KEEPFILTERS(VALUES('DateTable'[Date])),
+	CALCULATE(SUM('sales_data'[sales]))
+)
+    MEASURE 'SalesWeatherCorrelationTable'[weather_index average per Date] = AVERAGEX(
+	KEEPFILTERS(VALUES('DateTable'[Date])),
+	CALCULATE(AVERAGE('sales_data'[weather_index]))
+)
+    MEASURE 'SalesWeatherCorrelationTable'[Average of sales and Average of weather_index correlation for Date] = VAR __CORRELATION_TABLE = VALUES('DateTable'[Date])
+VAR __COUNT =
+	COUNTX(
+		KEEPFILTERS(__CORRELATION_TABLE),
+		CALCULATE(
+			AVERAGE('sales_data'[sales])
+				* AVERAGE('sales_data'[weather_index])
+		)
+	)
+VAR __SUM_X =
+	SUMX(
+		KEEPFILTERS(__CORRELATION_TABLE),
+		CALCULATE(AVERAGE('sales_data'[sales]))
+	)
+VAR __SUM_Y =
+	SUMX(
+		KEEPFILTERS(__CORRELATION_TABLE),
+		CALCULATE(AVERAGE('sales_data'[weather_index]))
+	)
+VAR __SUM_XY =
+	SUMX(
+		KEEPFILTERS(__CORRELATION_TABLE),
+		CALCULATE(
+			AVERAGE('sales_data'[sales])
+				* AVERAGE('sales_data'[weather_index]) * 1.
+		)
+	)
+VAR __SUM_X2 =
+	SUMX(
+		KEEPFILTERS(__CORRELATION_TABLE),
+		CALCULATE(AVERAGE('sales_data'[sales]) ^ 2)
+	)
+VAR __SUM_Y2 =
+	SUMX(
+		KEEPFILTERS(__CORRELATION_TABLE),
+		CALCULATE(AVERAGE('sales_data'[weather_index]) ^ 2)
+	)
+RETURN
+	DIVIDE(
+		__COUNT * __SUM_XY - __SUM_X * __SUM_Y * 1.,
+		SQRT(
+			(__COUNT * __SUM_X2 - __SUM_X ^ 2)
+				* (__COUNT * __SUM_Y2 - __SUM_Y ^ 2)
+		)
+	)
+    MEASURE 'SalesWeatherCorrelationTable'[MeanDailySales and MeanDailyWeatherIndex correlation for Date] = VAR __CORRELATION_TABLE = VALUES('DateTable'[Date])
+VAR __COUNT =
+	COUNTX(
+		KEEPFILTERS(__CORRELATION_TABLE),
+		CALCULATE([MeanDailySalesOpenOnly] * [MeanDailyWeatherIndex])
+	)
+VAR __SUM_X = SUMX(KEEPFILTERS(__CORRELATION_TABLE), CALCULATE([MeanDailySalesOpenOnly]))
+VAR __SUM_Y =
+	SUMX(
+		KEEPFILTERS(__CORRELATION_TABLE),
+		CALCULATE([MeanDailyWeatherIndex])
+	)
+VAR __SUM_XY =
+	SUMX(
+		KEEPFILTERS(__CORRELATION_TABLE),
+		CALCULATE([MeanDailySalesOpenOnly] * [MeanDailyWeatherIndex] * 1.)
+	)
+VAR __SUM_X2 =
+	SUMX(
+		KEEPFILTERS(__CORRELATION_TABLE),
+		CALCULATE([MeanDailySalesOpenOnly] ^ 2)
+	)
+VAR __SUM_Y2 =
+	SUMX(
+		KEEPFILTERS(__CORRELATION_TABLE),
+		CALCULATE([MeanDailyWeatherIndex] ^ 2)
+	)
+RETURN
+	DIVIDE(
+		__COUNT * __SUM_XY - __SUM_X * __SUM_Y * 1.,
+		SQRT(
+			(__COUNT * __SUM_X2 - __SUM_X ^ 2)
+				* (__COUNT * __SUM_Y2 - __SUM_Y ^ 2)
+		)
+	)
+    MEASURE 'SalesWeatherCorrelationTable'[Average of sales and Average of weather_index correlation for Hour] = VAR __CORRELATION_TABLE = VALUES('DayTimeTable'[Hour])
+VAR __COUNT =
+	COUNTX(
+		KEEPFILTERS(__CORRELATION_TABLE),
+		CALCULATE(
+			AVERAGE('sales_data'[sales])
+				* AVERAGE('sales_data'[weather_index])
+		)
+	)
+VAR __SUM_X =
+	SUMX(
+		KEEPFILTERS(__CORRELATION_TABLE),
+		CALCULATE(AVERAGE('sales_data'[sales]))
+	)
+VAR __SUM_Y =
+	SUMX(
+		KEEPFILTERS(__CORRELATION_TABLE),
+		CALCULATE(AVERAGE('sales_data'[weather_index]))
+	)
+VAR __SUM_XY =
+	SUMX(
+		KEEPFILTERS(__CORRELATION_TABLE),
+		CALCULATE(
+			AVERAGE('sales_data'[sales])
+				* AVERAGE('sales_data'[weather_index]) * 1.
+		)
+	)
+VAR __SUM_X2 =
+	SUMX(
+		KEEPFILTERS(__CORRELATION_TABLE),
+		CALCULATE(AVERAGE('sales_data'[sales]) ^ 2)
+	)
+VAR __SUM_Y2 =
+	SUMX(
+		KEEPFILTERS(__CORRELATION_TABLE),
+		CALCULATE(AVERAGE('sales_data'[weather_index]) ^ 2)
+	)
+RETURN
+	DIVIDE(
+		__COUNT * __SUM_XY - __SUM_X * __SUM_Y * 1.,
+		SQRT(
+			(__COUNT * __SUM_X2 - __SUM_X ^ 2)
+				* (__COUNT * __SUM_Y2 - __SUM_Y ^ 2)
+		)
+	)
+    MEASURE 'SalesWeatherCorrelationTable'[Sum of sales and Average of weather_index correlation for Hour] = VAR __CORRELATION_TABLE = VALUES('DayTimeTable'[Hour])
+VAR __COUNT =
+	COUNTX(
+		KEEPFILTERS(__CORRELATION_TABLE),
+		CALCULATE(SUM('sales_data'[sales]) * AVERAGE('sales_data'[weather_index]))
+	)
+VAR __SUM_X =
+	SUMX(
+		KEEPFILTERS(__CORRELATION_TABLE),
+		CALCULATE(SUM('sales_data'[sales]))
+	)
+VAR __SUM_Y =
+	SUMX(
+		KEEPFILTERS(__CORRELATION_TABLE),
+		CALCULATE(AVERAGE('sales_data'[weather_index]))
+	)
+VAR __SUM_XY =
+	SUMX(
+		KEEPFILTERS(__CORRELATION_TABLE),
+		CALCULATE(
+			SUM('sales_data'[sales])
+				* AVERAGE('sales_data'[weather_index]) * 1.
+		)
+	)
+VAR __SUM_X2 =
+	SUMX(
+		KEEPFILTERS(__CORRELATION_TABLE),
+		CALCULATE(SUM('sales_data'[sales]) ^ 2)
+	)
+VAR __SUM_Y2 =
+	SUMX(
+		KEEPFILTERS(__CORRELATION_TABLE),
+		CALCULATE(AVERAGE('sales_data'[weather_index]) ^ 2)
+	)
+RETURN
+	DIVIDE(
+		__COUNT * __SUM_XY - __SUM_X * __SUM_Y * 1.,
+		SQRT(
+			(__COUNT * __SUM_X2 - __SUM_X ^ 2)
+				* (__COUNT * __SUM_Y2 - __SUM_Y ^ 2)
+		)
+	)
+    MEASURE 'SalesWeatherCorrelationTable'[MeanSalesPerLocationAvg and MeanWeatherIndexPerLocationAvg correlation for Hour] = VAR __CORRELATION_TABLE = VALUES('DayTimeTable'[Hour])
+VAR __COUNT =
+	COUNTX(
+		KEEPFILTERS(__CORRELATION_TABLE),
+		CALCULATE([CrossLocationMeanOfMeanSales] * [CrossLocationMeanOfMeanWeatherIndex])
+	)
+VAR __SUM_X =
+	SUMX(
+		KEEPFILTERS(__CORRELATION_TABLE),
+		CALCULATE([CrossLocationMeanOfMeanSales])
+	)
+VAR __SUM_Y =
+	SUMX(
+		KEEPFILTERS(__CORRELATION_TABLE),
+		CALCULATE([CrossLocationMeanOfMeanWeatherIndex])
+	)
+VAR __SUM_XY =
+	SUMX(
+		KEEPFILTERS(__CORRELATION_TABLE),
+		CALCULATE(
+			[CrossLocationMeanOfMeanSales]
+				* [CrossLocationMeanOfMeanWeatherIndex] * 1.
+		)
+	)
+VAR __SUM_X2 =
+	SUMX(
+		KEEPFILTERS(__CORRELATION_TABLE),
+		CALCULATE([CrossLocationMeanOfMeanSales] ^ 2)
+	)
+VAR __SUM_Y2 =
+	SUMX(
+		KEEPFILTERS(__CORRELATION_TABLE),
+		CALCULATE([CrossLocationMeanOfMeanWeatherIndex] ^ 2)
+	)
+RETURN
+	DIVIDE(
+		__COUNT * __SUM_XY - __SUM_X * __SUM_Y * 1.,
+		SQRT(
+			(__COUNT * __SUM_X2 - __SUM_X ^ 2)
+				* (__COUNT * __SUM_Y2 - __SUM_Y ^ 2)
+		)
+	)
+    MEASURE 'SalesWeatherCorrelationTable'[CrossLocationMeanOfMeanSales and CrossLocationMeanOfMeanWeatherIndex correlation for Date] = VAR __CORRELATION_TABLE = VALUES('DateTable'[Date])
+VAR __COUNT =
+	COUNTX(
+		KEEPFILTERS(__CORRELATION_TABLE),
+		CALCULATE(
+			[CrossLocationMeanOfMeanSales]
+				* [CrossLocationMeanOfMeanWeatherIndex]
+		)
+	)
+VAR __SUM_X =
+	SUMX(
+		KEEPFILTERS(__CORRELATION_TABLE),
+		CALCULATE([CrossLocationMeanOfMeanSales])
+	)
+VAR __SUM_Y =
+	SUMX(
+		KEEPFILTERS(__CORRELATION_TABLE),
+		CALCULATE([CrossLocationMeanOfMeanWeatherIndex])
+	)
+VAR __SUM_XY =
+	SUMX(
+		KEEPFILTERS(__CORRELATION_TABLE),
+		CALCULATE(
+			[CrossLocationMeanOfMeanSales]
+				* [CrossLocationMeanOfMeanWeatherIndex] * 1.
+		)
+	)
+VAR __SUM_X2 =
+	SUMX(
+		KEEPFILTERS(__CORRELATION_TABLE),
+		CALCULATE([CrossLocationMeanOfMeanSales] ^ 2)
+	)
+VAR __SUM_Y2 =
+	SUMX(
+		KEEPFILTERS(__CORRELATION_TABLE),
+		CALCULATE([CrossLocationMeanOfMeanWeatherIndex] ^ 2)
+	)
+RETURN
+	DIVIDE(
+		__COUNT * __SUM_XY - __SUM_X * __SUM_Y * 1.,
+		SQRT(
+			(__COUNT * __SUM_X2 - __SUM_X ^ 2)
+				* (__COUNT * __SUM_Y2 - __SUM_Y ^ 2)
+		)
+	)
+    MEASURE 'SalesWeatherCorrelationTable'[CrossLocationMeanOfMeanSalesDaily and CrossLocationMeanOfMeanWeatherIndexDaily correlation for Date] = VAR __CORRELATION_TABLE = VALUES('DateTable'[Date])
+VAR __COUNT =
+	COUNTX(
+		KEEPFILTERS(__CORRELATION_TABLE),
+		CALCULATE(
+			[CrossLocationMeanOfMeanSalesDaily]
+				* [CrossLocationMeanOfMeanWeatherIndexDaily]
+		)
+	)
+VAR __SUM_X =
+	SUMX(
+		KEEPFILTERS(__CORRELATION_TABLE),
+		CALCULATE([CrossLocationMeanOfMeanSalesDaily])
+	)
+VAR __SUM_Y =
+	SUMX(
+		KEEPFILTERS(__CORRELATION_TABLE),
+		CALCULATE([CrossLocationMeanOfMeanWeatherIndexDaily])
+	)
+VAR __SUM_XY =
+	SUMX(
+		KEEPFILTERS(__CORRELATION_TABLE),
+		CALCULATE(
+			[CrossLocationMeanOfMeanSalesDaily]
+				* [CrossLocationMeanOfMeanWeatherIndexDaily] * 1.
+		)
+	)
+VAR __SUM_X2 =
+	SUMX(
+		KEEPFILTERS(__CORRELATION_TABLE),
+		CALCULATE([CrossLocationMeanOfMeanSalesDaily] ^ 2)
+	)
+VAR __SUM_Y2 =
+	SUMX(
+		KEEPFILTERS(__CORRELATION_TABLE),
+		CALCULATE([CrossLocationMeanOfMeanWeatherIndexDaily] ^ 2)
+	)
+RETURN
+	DIVIDE(
+		__COUNT * __SUM_XY - __SUM_X * __SUM_Y * 1.,
+		SQRT(
+			(__COUNT * __SUM_X2 - __SUM_X ^ 2)
+				* (__COUNT * __SUM_Y2 - __SUM_Y ^ 2)
+		)
+	)
+    MEASURE 'SalesWeatherCorrelationTable'[CrossLocationMeanOfMeanSales and CrossLocationMeanOfMeanWeatherIndex correlation for Hour] = VAR __CORRELATION_TABLE = VALUES('sales_data'[Hour])
+VAR __COUNT =
+	COUNTX(
+		KEEPFILTERS(__CORRELATION_TABLE),
+		CALCULATE(
+			[CrossLocationMeanOfMeanSales]
+				* [CrossLocationMeanOfMeanWeatherIndex]
+		)
+	)
+VAR __SUM_X =
+	SUMX(
+		KEEPFILTERS(__CORRELATION_TABLE),
+		CALCULATE([CrossLocationMeanOfMeanSales])
+	)
+VAR __SUM_Y =
+	SUMX(
+		KEEPFILTERS(__CORRELATION_TABLE),
+		CALCULATE([CrossLocationMeanOfMeanWeatherIndex])
+	)
+VAR __SUM_XY =
+	SUMX(
+		KEEPFILTERS(__CORRELATION_TABLE),
+		CALCULATE(
+			[CrossLocationMeanOfMeanSales]
+				* [CrossLocationMeanOfMeanWeatherIndex] * 1.
+		)
+	)
+VAR __SUM_X2 =
+	SUMX(
+		KEEPFILTERS(__CORRELATION_TABLE),
+		CALCULATE([CrossLocationMeanOfMeanSales] ^ 2)
+	)
+VAR __SUM_Y2 =
+	SUMX(
+		KEEPFILTERS(__CORRELATION_TABLE),
+		CALCULATE([CrossLocationMeanOfMeanWeatherIndex] ^ 2)
+	)
+RETURN
+	DIVIDE(
+		__COUNT * __SUM_XY - __SUM_X * __SUM_Y * 1.,
+		SQRT(
+			(__COUNT * __SUM_X2 - __SUM_X ^ 2)
+				* (__COUNT * __SUM_Y2 - __SUM_Y ^ 2)
+		)
+	)
+    MEASURE 'WeatherIndexBins'[SumSalesByWeatherBinsMatrixFormat] = // Formats the output of the subject measure into a consistent format for matrix
+// representation. Faulty values are set to 0 via COALESCE.
+VAR ValueToFormat = COALESCE([SumSalesByWeatherBins], 0)
+RETURN
+SWITCH(
+    TRUE(),
+    ABS(ValueToFormat) >= 1000000000, FORMAT(ValueToFormat/1000000000, "0.00") & "B",
+    ABS(ValueToFormat) >= 1000000,    FORMAT(ValueToFormat/1000000,    "0.00") & "M",
+    ABS(ValueToFormat) >= 1000,       FORMAT(ValueToFormat/1000,       "0.00") & "K",
+    TRUE,                             FORMAT(ValueToFormat,            "00.00")
+)
+    MEASURE 'WeatherIndexBins'[LogSumSalesByWeatherBin] = //Log10 version of the subject measure. Used for setting the matrix visual's
+//cell background color via conditional formatting using gradient.
+VAR Initial = [SumSalesByWeatherBins]
+RETURN
+    IF(Initial <= 1, 0, LOG10(Initial))
+    MEASURE 'WeatherIndexBins'[SumSalesByWeatherBins] = CALCULATE (
+    [SalesSumAggregationVersion],
+    WeatherIndexFilterGroup[Calculation group column] = "WeatherIndexBinFilter"
+)
+    MEASURE 'WeatherIndexBins'[MeanHourOfSalesByWeatherBins] = CALCULATE (
+    [HourOfSaleMean],
+    WeatherIndexFilterGroup[Calculation group column] = "WeatherIndexBinFilter"
+)
+    MEASURE 'WeatherIndexBins'[MeanHourlySalesByWeatherBins] = CALCULATE (
+    [SalesSumAggregationOverHours],
+    WeatherIndexFilterGroup[Calculation group column] = "WeatherIndexBinFilter"
+)
+    MEASURE 'WeatherIndexBins'[MeanSalesByWeatherBinsLocationVersion] = VAR SelectedBins =
+    SUMMARIZE (
+        VALUES ( WeatherIndexBins ),
+        WeatherIndexBins[BinStart],
+        WeatherIndexBins[BinEnd]
+    )
+RETURN
+CALCULATE (
+    [CrossLocationMeanOfMeanSales],
+    FILTER (
+        sales_data,
+        -- weather index falls into ANY selected bin
+        SUMX (
+            SelectedBins,
+            IF (
+                sales_data[weather_index] > WeatherIndexBins[BinStart] &&
+                sales_data[weather_index] <=  WeatherIndexBins[BinEnd],
+                1,
+                0
+            )
+        ) > 0
+    )
+)
+    MEASURE 'WeatherIndexBins'[MeanSalesByWeatherBinsMatrixFormat] = // Formats the output of the subject measure into a consistent format for matrix
+// representation. Faulty values are set to 0 via COALESCE.
+VAR ValueToFormat = COALESCE([MeanSalesByWeatherBinsLocationVersion], 0)
+RETURN
+SWITCH(
+    TRUE(),
+    ABS(ValueToFormat) >= 1000000000, FORMAT(ValueToFormat/1000000000, "0.00") & "B",
+    ABS(ValueToFormat) >= 1000000,    FORMAT(ValueToFormat/1000000,    "0.00") & "M",
+    ABS(ValueToFormat) >= 1000,       FORMAT(ValueToFormat/1000,       "0.00") & "K",
+    TRUE,                             FORMAT(ValueToFormat,            "00.00")
+)
+    MEASURE 'WeatherIndexBins'[LogMeanSalesByWeatherBin] = //Log10 version of the subject measure. Used for setting the matrix visual's
+//cell background color via conditional formatting using gradient.
+VAR Initial = [MeanSalesByWeatherBinsLocationVersion]
+RETURN
+    IF(Initial <= 1, 0, LOG10(Initial))
+    MEASURE 'WeatherIndexBins'[MeanSalesByWeatherBinsLocationVersion2] = CALCULATE (
+    [CrossLocationMeanOfMeanSales],
+    WeatherIndexFilterGroup[Calculation group column] = "WeatherIndexBinFilter"
+)
+    MEASURE 'WeatherIndexBins'[MeanSalesByWeatherBinsMatrixFormat2] = // Formats the output of the subject measure into a consistent format for matrix
+// representation. Faulty values are set to 0 via COALESCE.
+VAR ValueToFormat = COALESCE([MeanSalesByWeatherBinsLocationVersion2], 0)
+RETURN
+SWITCH(
+    TRUE(),
+    ABS(ValueToFormat) >= 1000000000, FORMAT(ValueToFormat/1000000000, "0.00") & "B",
+    ABS(ValueToFormat) >= 1000000,    FORMAT(ValueToFormat/1000000,    "0.00") & "M",
+    ABS(ValueToFormat) >= 1000,       FORMAT(ValueToFormat/1000,       "0.00") & "K",
+    TRUE,                             FORMAT(ValueToFormat,            "00.00")
+)
+    MEASURE 'WeatherIndexBins'[LogMeanSalesByWeatherBin2] = //Log10 version of the subject measure. Used for setting the matrix visual's
+//cell background color via conditional formatting using gradient.
+VAR Initial = [MeanSalesByWeatherBinsLocationVersion2]
+RETURN
+    IF(Initial <= 1, 0, LOG10(Initial))
+    MEASURE 'SalesTimeCorrelationTable'[MeanSales and MeanHourOfSalesByWeatherBins2 correlation for BinEnd] = VAR __CORRELATION_TABLE = VALUES('WeatherIndexBins'[BinEnd])
+VAR __COUNT =
+	COUNTX(
+		KEEPFILTERS(__CORRELATION_TABLE),
+		CALCULATE([SalesSumAggregationOverHours] * [MeanHourOfSalesByWeatherBins])
+	)
+VAR __SUM_X = SUMX(KEEPFILTERS(__CORRELATION_TABLE), CALCULATE([SalesSumAggregationOverHours]))
+VAR __SUM_Y =
+	SUMX(
+		KEEPFILTERS(__CORRELATION_TABLE),
+		CALCULATE([MeanHourOfSalesByWeatherBins])
+	)
+VAR __SUM_XY =
+	SUMX(
+		KEEPFILTERS(__CORRELATION_TABLE),
+		CALCULATE([SalesSumAggregationOverHours] * [MeanHourOfSalesByWeatherBins] * 1.)
+	)
+VAR __SUM_X2 = SUMX(KEEPFILTERS(__CORRELATION_TABLE), CALCULATE([SalesSumAggregationOverHours] ^ 2))
+VAR __SUM_Y2 =
+	SUMX(
+		KEEPFILTERS(__CORRELATION_TABLE),
+		CALCULATE([MeanHourOfSalesByWeatherBins] ^ 2)
+	)
+RETURN
+	DIVIDE(
+		__COUNT * __SUM_XY - __SUM_X * __SUM_Y * 1.,
+		SQRT(
+			(__COUNT * __SUM_X2 - __SUM_X ^ 2)
+				* (__COUNT * __SUM_Y2 - __SUM_Y ^ 2)
+		)
+	)
+    MEASURE 'SalesTimeCorrelationTable'[MeanSalesByWeatherBins and MeanHourOfSalesByWeatherBins correlation for BinEnd] = VAR __CORRELATION_TABLE = VALUES('WeatherIndexBins'[BinEnd])
+VAR __COUNT =
+	COUNTX(
+		KEEPFILTERS(__CORRELATION_TABLE),
+		CALCULATE([MeanHourlySalesByWeatherBins] * [MeanHourOfSalesByWeatherBins])
+	)
+VAR __SUM_X =
+	SUMX(
+		KEEPFILTERS(__CORRELATION_TABLE),
+		CALCULATE([MeanHourlySalesByWeatherBins])
+	)
+VAR __SUM_Y =
+	SUMX(
+		KEEPFILTERS(__CORRELATION_TABLE),
+		CALCULATE([MeanHourOfSalesByWeatherBins])
+	)
+VAR __SUM_XY =
+	SUMX(
+		KEEPFILTERS(__CORRELATION_TABLE),
+		CALCULATE([MeanHourlySalesByWeatherBins] * [MeanHourOfSalesByWeatherBins] * 1.)
+	)
+VAR __SUM_X2 =
+	SUMX(
+		KEEPFILTERS(__CORRELATION_TABLE),
+		CALCULATE([MeanHourlySalesByWeatherBins] ^ 2)
+	)
+VAR __SUM_Y2 =
+	SUMX(
+		KEEPFILTERS(__CORRELATION_TABLE),
+		CALCULATE([MeanHourOfSalesByWeatherBins] ^ 2)
+	)
+RETURN
+	DIVIDE(
+		__COUNT * __SUM_XY - __SUM_X * __SUM_Y * 1.,
+		SQRT(
+			(__COUNT * __SUM_X2 - __SUM_X ^ 2)
+				* (__COUNT * __SUM_Y2 - __SUM_Y ^ 2)
+		)
+	)
+    MEASURE 'DailyMeasureDefinitionsNormalized'[MeanSalesNormalized] = Var MaxValue = [MeanSalesMax]
+RETURN
+    DIVIDE([SalesSumAggregationOverHours], MaxValue)
+    MEASURE 'DailyMeasureDefinitionsNormalized'[MeanSalesMin] = CALCULATE(
+    MINX(
+        VALUES('sales_data'[Hour]),
+        [SalesSumAggregationOverHours]
+    ),
+    ALLSELECTED(DayTimeTable[Hour])
+)
+    MEASURE 'DailyMeasureDefinitionsNormalized'[MeanSalesMax] = CALCULATE(
+    MAXX(
+        VALUES('sales_data'[Hour]),
+        [SalesSumAggregationOverHours]
+    ),
+    ALLSELECTED(DayTimeTable[Hour])
+)
+    MEASURE 'LocationFocusedSalesMeasureDefinitions'[LocationCount] = COUNTROWS('location_data')
+    MEASURE 'LocationFocusedSalesMeasureDefinitions'[CrossLocationMeanOfMeanSales] = // Computes the mean of the mean sales of locations, representing typical sales figures
+// across locations. Respects all filter contexts.
+AVERAGEX(
+    VALUES('sales_data'[location_id]),   -- iterate over locations
+    CALCULATE( [SalesSumAggregationOverHours] )           -- compute MeanSales per location
+)
+    MEASURE 'LocationFocusedSalesMeasureDefinitions'[CrossLocationSdevOfMeanSales] = // Computes the sample standard deviation of the mean sales of locations, representing typical variation of sales figures
+// across locations. Respects all filter contexts. 
+STDEVX.S(                                           -- Compute sample standard deviation
+    VALUES('sales_data'[location_id]),              -- Iterate over locations
+    CALCULATE( [SalesSumAggregationOverHours] )           -- Compute MeanSales per location
+)
+    MEASURE 'LocationFocusedSalesMeasureDefinitions'[CrossLocationStandardErrorOfMeanSales] = // Computes the standard error for the mean sales across locations, respecting all filter context.
+DIVIDE(
+    [CrossLocationSdevOfMeanSales],            -- Fetch standard deviation
+    SQRT(COUNTROWS('location_data'))           -- Fetch count of locations in filter context.
+)
+    MEASURE 'LocationFocusedSalesMeasureDefinitions'[CrossLocationMaxOfMeanSales] = MAXX(ALL('sales_data'[Hour]), [SalesSumAggregationOverHours])
+    MEASURE 'LocationFocusedSalesMeasureDefinitions'[CrossLocationMinOfMeanSales] = MINX(ALL('sales_data'[Hour]), [SalesSumAggregationOverHours])
+    MEASURE 'LocationFocusedSalesMeasureDefinitions'[CrossLocationLowerErrorBoundOfMeanSales] = [CrossLocationMeanOfMeanSales] - [CrossLocationStandardErrorOfMeanSales]
+    MEASURE 'LocationFocusedSalesMeasureDefinitions'[CrossLocationUpperErrorBoundOfMeanSales] = [CrossLocationMeanOfMeanSales] + [CrossLocationStandardErrorOfMeanSales]
+    MEASURE 'LocationFocusedSalesMeasureDefinitions'[CrossLocationMeanOfMeanSalesDaily] = // Computes the mean of the mean sales of locations, representing typical sales figures
+// across locations. Respects all filter contexts.
+AVERAGEX(
+    VALUES('sales_data'[location_id]),   -- iterate over locations
+    CALCULATE( [SalesSumAggregationOverHours],
+        ALL( DayTimeTable[Hour] )       -- compute MeanSales per location
+)
+)
+    MEASURE 'LocationFocusedWeatherMeasureDefinitions'[CrossLocationMeanOfMeanWeatherIndex] = // Computes the mean of the mean weather indices of locations, representing typical weather index figures
+// across locations. Respects all filter contexts.
+AVERAGEX(
+    VALUES('sales_data'[location_id]),              -- iterate over locations
+    CALCULATE( [WeatherIndexMeanByHour] )           -- compute mean weather index per location
+)
+    MEASURE 'LocationFocusedWeatherMeasureDefinitions'[CrossLocationStandardErrorOfMeanWeatherIndex] = DIVIDE(
+    [CrossLocationSdevOfMeanWeatherIndex],   -- iterate over locations
+    SQRT(COUNTROWS('location_data'))           -- compute MeanSales per location
+)
+    MEASURE 'LocationFocusedWeatherMeasureDefinitions'[CrossLocationSdevOfMeanWeatherIndex] = STDEVX.S(
+    VALUES('sales_data'[location_id]),              -- iterate over locations
+    CALCULATE( [WeatherIndexMeanByHour] )           -- fetch mean weather index per location
+)
+    MEASURE 'LocationFocusedWeatherMeasureDefinitions'[CrossLocationLowerErrorBoundOfMeanWeatherIndex] = [CrossLocationMeanOfMeanWeatherIndex] - [CrossLocationStandardErrorOfMeanWeatherIndex]
+    MEASURE 'LocationFocusedWeatherMeasureDefinitions'[CrossLocationUpperErrorBoundOfMeanWeatherIndex] = [CrossLocationMeanOfMeanWeatherIndex] + [CrossLocationStandardErrorOfMeanWeatherIndex]
+    MEASURE 'LocationFocusedWeatherMeasureDefinitions'[CrossLocationMeanOfMeanWeatherIndexDaily] = // Computes the mean of the mean weather indices of locations, representing typical weather index figures
+// across locations. Filtering forces all hours, focusing the computation on the full day level.
+AVERAGEX(
+    VALUES('sales_data'[location_id]),              -- iterate over locations
+    CALCULATE( [WeatherIndexMeanByHour],
+        ALL(DayTimeTable[Hour])
+    )           -- compute mean weather index per location
+)
+    MEASURE 'MeasuresByHour'[SalesSumAggregationByHours] = CALCULATE(
+    [SalesSumAggregationVersion],
+    HourlyLevelAggregationTypeGroup[Calculation group column] = SELECTEDVALUE(HourlyLevelAggregationTypeGroup[Calculation group column])
+)
+    MEASURE 'ColorScaleValueTable'[MaxRelativeColorScale] = MAX('ColorScaleValueTable'[RelativeValue])
+    MEASURE 'ColorScaleValueTable'[MaxAbsoluteColorScale] = [SalesSumCoalesced] * [MaxRelativeColorScale]
+    MEASURE 'ColorScaleValueTable'[MinRelativeColorScale] = MIN('ColorScaleValueTable'[RelativeValue])
+    MEASURE 'ColorScaleValueTable'[MinAbsoluteColorScale] = [SalesSumCoalesced] * [MinRelativeColorScale]
+    MEASURE 'ColorScaleValueTable'[FilteredColorscaleDataset] = MAX([MinAbsoluteColorScale], MIN([MaxAbsoluteColorScale], [SalesSumCoalesced]))
+
+EVALUATE
+    SUMMARIZECOLUMNS(
+        "TotalRevenue", [TotalRevenue],
+        "SalesMean", [SalesMean],
+        "WeatherIndexMeanByHour", [WeatherIndexMeanByHour],
+        "NormalizedMeanDailySales", [NormalizedMeanDailySales],
+        "SalesMeanMaxByHour", [SalesMeanMaxByHour],
+        "SalesSumAggregationVersion", [SalesSumAggregationVersion],
+        "SalesMeanAllHoursByHour", [SalesMeanAllHoursByHour],
+        "SalesSumAggregationOverHours", [SalesSumAggregationOverHours],
+        "WeatherIndexMean", [WeatherIndexMean],
+        "HourOfSaleMean", [HourOfSaleMean],
+        "SalesMedian", [SalesMedian],
+        "SalesSumMedianByHour", [SalesSumMedianByHour],
+        "SalesSum", [SalesSum],
+        "SalesSumByHour", [SalesSumByHour],
+        "SalesMeanByHour", [SalesMeanByHour],
+        "SalesMeanByHour2", [SalesMeanByHour2],
+        "SelectedHourlySalesAggregation", [SelectedHourlySalesAggregation],
+        "ChainedSummarization", [ChainedSummarization],
+        "ChainedSummarization2", [ChainedSummarization2],
+        "SalesSumMatrixFormat", [SalesSumMatrixFormat],
+        "LogSalesSum", [LogSalesSum],
+        "SalesSumCoalesced", [SalesSumCoalesced],
+        "SalesSumCoalescedMatrixFormat", [SalesSumCoalescedMatrixFormat],
+        "SumDailySales", [SumDailySales],
+        "MeanDailySalesOpenOnly", [MeanDailySalesOpenOnly],
+        "MeanDailyWeatherIndex", [MeanDailyWeatherIndex],
+        "MeanSalesPerLocationAvgNormalized", [MeanSalesPerLocationAvgNormalized],
+        "MeanDailySalesAllDays", [MeanDailySalesAllDays],
+        "DrillThroughTitle", [DrillThroughTitle],
+        "DrillThroughTitlePerson", [DrillThroughTitlePerson],
+        "SalespersonLocationName", [SalespersonLocationName],
+        "HourMatrixVersion", [HourMatrixVersion],
+        "NumberOfEventsInRangeAbsolute", [NumberOfEventsInRangeAbsolute],
+        "NumberOfEventsInRangeRelative", [NumberOfEventsInRangeRelative],
+        "SelectedHourlyAggregation", [SelectedHourlyAggregation],
+        "sales average per Date", [sales average per Date],
+        "weather_index average per Date", [weather_index average per Date],
+        "Average of sales and Average of weather_index correlation for Date", [Average of sales and Average of weather_index correlation for Date],
+        "MeanDailySales and MeanDailyWeatherIndex correlation for Date", [MeanDailySales and MeanDailyWeatherIndex correlation for Date],
+        "Average of sales and Average of weather_index correlation for Hour", [Average of sales and Average of weather_index correlation for Hour],
+        "Sum of sales and Average of weather_index correlation for Hour", [Sum of sales and Average of weather_index correlation for Hour],
+        "MeanSalesPerLocationAvg and MeanWeatherIndexPerLocationAvg correlation for Hour", [MeanSalesPerLocationAvg and MeanWeatherIndexPerLocationAvg correlation for Hour],
+        "CrossLocationMeanOfMeanSales and CrossLocationMeanOfMeanWeatherIndex correlation for Date", [CrossLocationMeanOfMeanSales and CrossLocationMeanOfMeanWeatherIndex correlation for Date],
+        "CrossLocationMeanOfMeanSalesDaily and CrossLocationMeanOfMeanWeatherIndexDaily correlation for Date", [CrossLocationMeanOfMeanSalesDaily and CrossLocationMeanOfMeanWeatherIndexDaily correlation for Date],
+        "CrossLocationMeanOfMeanSales and CrossLocationMeanOfMeanWeatherIndex correlation for Hour", [CrossLocationMeanOfMeanSales and CrossLocationMeanOfMeanWeatherIndex correlation for Hour],
+        "SumSalesByWeatherBinsMatrixFormat", [SumSalesByWeatherBinsMatrixFormat],
+        "LogSumSalesByWeatherBin", [LogSumSalesByWeatherBin],
+        "SumSalesByWeatherBins", [SumSalesByWeatherBins],
+        "MeanHourOfSalesByWeatherBins", [MeanHourOfSalesByWeatherBins],
+        "MeanHourlySalesByWeatherBins", [MeanHourlySalesByWeatherBins],
+        "MeanSalesByWeatherBinsLocationVersion", [MeanSalesByWeatherBinsLocationVersion],
+        "MeanSalesByWeatherBinsMatrixFormat", [MeanSalesByWeatherBinsMatrixFormat],
+        "LogMeanSalesByWeatherBin", [LogMeanSalesByWeatherBin],
+        "MeanSalesByWeatherBinsLocationVersion2", [MeanSalesByWeatherBinsLocationVersion2],
+        "MeanSalesByWeatherBinsMatrixFormat2", [MeanSalesByWeatherBinsMatrixFormat2],
+        "LogMeanSalesByWeatherBin2", [LogMeanSalesByWeatherBin2],
+        "MeanSales and MeanHourOfSalesByWeatherBins2 correlation for BinEnd", [MeanSales and MeanHourOfSalesByWeatherBins2 correlation for BinEnd],
+        "MeanSalesByWeatherBins and MeanHourOfSalesByWeatherBins correlation for BinEnd", [MeanSalesByWeatherBins and MeanHourOfSalesByWeatherBins correlation for BinEnd],
+        "MeanSalesNormalized", [MeanSalesNormalized],
+        "MeanSalesMin", [MeanSalesMin],
+        "MeanSalesMax", [MeanSalesMax],
+        "LocationCount", [LocationCount],
+        "CrossLocationMeanOfMeanSales", [CrossLocationMeanOfMeanSales],
+        "CrossLocationSdevOfMeanSales", [CrossLocationSdevOfMeanSales],
+        "CrossLocationStandardErrorOfMeanSales", [CrossLocationStandardErrorOfMeanSales],
+        "CrossLocationMaxOfMeanSales", [CrossLocationMaxOfMeanSales],
+        "CrossLocationMinOfMeanSales", [CrossLocationMinOfMeanSales],
+        "CrossLocationLowerErrorBoundOfMeanSales", [CrossLocationLowerErrorBoundOfMeanSales],
+        "CrossLocationUpperErrorBoundOfMeanSales", [CrossLocationUpperErrorBoundOfMeanSales],
+        "CrossLocationMeanOfMeanSalesDaily", [CrossLocationMeanOfMeanSalesDaily],
+        "CrossLocationMeanOfMeanWeatherIndex", [CrossLocationMeanOfMeanWeatherIndex],
+        "CrossLocationStandardErrorOfMeanWeatherIndex", [CrossLocationStandardErrorOfMeanWeatherIndex],
+        "CrossLocationSdevOfMeanWeatherIndex", [CrossLocationSdevOfMeanWeatherIndex],
+        "CrossLocationLowerErrorBoundOfMeanWeatherIndex", [CrossLocationLowerErrorBoundOfMeanWeatherIndex],
+        "CrossLocationUpperErrorBoundOfMeanWeatherIndex", [CrossLocationUpperErrorBoundOfMeanWeatherIndex],
+        "CrossLocationMeanOfMeanWeatherIndexDaily", [CrossLocationMeanOfMeanWeatherIndexDaily],
+        "SalesSumAggregationByHours", [SalesSumAggregationByHours],
+        "MaxRelativeColorScale", [MaxRelativeColorScale],
+        "MaxAbsoluteColorScale", [MaxAbsoluteColorScale],
+        "MinRelativeColorScale", [MinRelativeColorScale],
+        "MinAbsoluteColorScale", [MinAbsoluteColorScale],
+        "FilteredColorscaleDataset", [FilteredColorscaleDataset]
+    )

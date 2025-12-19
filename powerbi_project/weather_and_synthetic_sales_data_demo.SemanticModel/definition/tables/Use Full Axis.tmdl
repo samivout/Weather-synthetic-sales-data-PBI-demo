@@ -1,0 +1,28 @@
+table 'Use Full Axis'
+	lineageTag: 461af12b-faaf-4c87-a54a-e1ae7f5c7164
+
+	calculationGroup
+		precedence: 10000
+
+		calculationItem 'Use Full Axis' =
+				
+				COALESCE(SELECTEDMEASURE(), 0)
+
+	column 'Use Full Axis'
+		dataType: string
+		lineageTag: dccf500a-6589-4222-8221-167642488abf
+		summarizeBy: none
+		sourceColumn: Name
+		sortByColumn: Ordinal
+
+		annotation SummarizationSetBy = Automatic
+
+	column Ordinal
+		dataType: int64
+		formatString: 0
+		lineageTag: 45142b22-f53f-4c30-afb2-6e21dc194000
+		summarizeBy: sum
+		sourceColumn: Ordinal
+
+		annotation SummarizationSetBy = Automatic
+

@@ -1,0 +1,16 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.4.0/schema.json",
+  "name": "55ae86e7f83ab80b3773",
+  "position": {
+    "x": 6.0058651026392962,
+    "y": 5.13064133016627,
+    "z": 5000,
+    "height": 94.991991457554718,
+    "width": 1268.416485564014,
+    "tabOrder": 0
+  },
+  "visualGroup": {
+    "displayName": "Top Slicer Controls Group",
+    "groupMode": "ScaleMode"
+  }
+}

@@ -1,0 +1,153 @@
+DEFINE
+    MEASURE 'DailyMeasureDefinitions'[SumDailySalesShifted] = 
+	
+VAR CurrentPeriodStart =
+    SWITCH (
+        TRUE(),
+        ISINSCOPE ( 'DateTable'[Date] ) || ISINSCOPE('DateTable'[DayOfMonth]),
+            MIN ( 'DateTable'[Date] ),
+
+        ISINSCOPE ( 'DateTable'[WeekOfYear] ),
+            MINX ( VALUES ( 'DateTable'[Date] ), 'DateTable'[Date] ),
+
+        ISINSCOPE ( 'DateTable'[MonthNo] ) || ISINSCOPE( 'DateTable'[MonthShort]) || ISINSCOPE( 'DateTable'[MonthLong] ),
+            STARTOFMONTH( 'DateTable'[Date] ),
+
+        ISINSCOPE ( 'DateTable'[QuarterNumber] ) || ISINSCOPE ( 'DateTable'[Quarter] ),
+            STARTOFQUARTER( 'DateTable'[Date] ),
+
+        ISINSCOPE ( 'DateTable'[Year] ),
+            STARTOFYEAR( 'DateTable'[Date] )
+    )
+
+VAR CurrentPeriodEnd =
+    SWITCH (
+        TRUE(),
+        ISINSCOPE ( 'DateTable'[Date] ) || ISINSCOPE('DateTable'[DayOfMonth]),
+            MAX ( 'DateTable'[Date] ),
+
+        ISINSCOPE ( 'DateTable'[WeekOfYear] ),
+            MAXX ( VALUES ( 'DateTable'[Date] ), 'DateTable'[Date] ),
+
+        ISINSCOPE ( 'DateTable'[MonthNo] ) || ISINSCOPE( 'DateTable'[MonthShort]) || ISINSCOPE( 'DateTable'[MonthLong] ),
+            ENDOFMONTH ( 'DateTable'[Date] ),
+
+        ISINSCOPE ( 'DateTable'[QuarterNumber] ) || ISINSCOPE ( 'DateTable'[Quarter] ),
+            ENDOFQUARTER ( 'DateTable'[Date] ),
+
+        ISINSCOPE ( 'DateTable'[Year] ),
+            ENDOFYEAR ( 'DateTable'[Date] )
+    )
+
+RETURN
+SWITCH (
+    TRUE(),
+
+    /* ================= DAILY ================= */
+    ISINSCOPE ( 'DateTable'[Date] ) || ISINSCOPE ( 'DateTable'[DayOfMonth] ),
+    VAR PrevDate =
+        CALCULATE (
+            MAX ( 'DateTable'[Date] ),
+            FILTER (
+                ALL ( 'DateTable'[Date] ),
+                'DateTable'[Date] > CurrentPeriodStart &&
+                'DateTable'[Date] < CurrentPeriodEnd &&
+                NOT ISBLANK ( [SumDailyAggregation] )
+            )
+        )
+    RETURN
+        CALCULATE (
+            [SumDailyAggregation],
+            'DateTable'[Date] = PrevDate
+        ),
+
+    /* ================= WEEK ================= */
+    ISINSCOPE ( 'DateTable'[WeekOfYear] ),
+    VAR PrevDate =
+        CALCULATE (
+            MAX ( 'DateTable'[Date] ),
+            FILTER (
+                ALL ( 'DateTable'[Date] ),
+                'DateTable'[Date] > CurrentPeriodStart &&
+                'DateTable'[Date] < CurrentPeriodEnd &&
+                NOT ISBLANK ( [SumDailyAggregation] )
+            ),
+            REMOVEFILTERS (
+                'DateTable'[MonthNo],
+                'DateTable'[MonthShort],
+                'DateTable'[MonthLong]
+            )
+        )
+    RETURN
+        CALCULATE (
+            [SumDailyAggregation],
+            'DateTable'[Date] = PrevDate
+        ),
+
+    /* ================= MONTH ================= */
+    ISINSCOPE ( 'DateTable'[MonthNo] )
+        || ISINSCOPE ( 'DateTable'[MonthShort] )
+        || ISINSCOPE ( 'DateTable'[MonthLong] ),
+    VAR PrevDate =
+        CALCULATE (
+            MAX ( 'DateTable'[Date] ),
+            FILTER (
+                ALL ( 'DateTable'[Date] ),
+                'DateTable'[Date] > CurrentPeriodStart &&
+                'DateTable'[Date] < CurrentPeriodEnd &&
+                NOT ISBLANK ( [SumDailyAggregation] )
+            ),
+            REMOVEFILTERS (
+                'DateTable'[Quarter],
+                'DateTable'[QuarterNumber]
+            )
+        )
+    RETURN
+        CALCULATE (
+            [SumDailyAggregation],
+            'DateTable'[Date] = PrevDate
+        ),
+
+    /* ================= QUARTER ================= */
+    ISINSCOPE ( 'DateTable'[QuarterNumber] )
+        || ISINSCOPE ( 'DateTable'[Quarter] ),
+    VAR PrevDate =
+        CALCULATE (
+            MAX ( 'DateTable'[Date] ),
+            FILTER (
+                ALL ( 'DateTable'[Date] ),
+                'DateTable'[Date] > CurrentPeriodStart &&
+                'DateTable'[Date] < CurrentPeriodEnd &&
+                NOT ISBLANK ( [SumDailyAggregation] )
+            ),
+            REMOVEFILTERS ( 'DateTable'[Year] )
+        )
+    RETURN
+        CALCULATE (
+            [SumDailyAggregation],
+            'DateTable'[Date] = PrevDate
+        ),
+
+    /* ================= YEAR ================= */
+    ISINSCOPE ( 'DateTable'[Year] ),
+    VAR PrevDate =
+        CALCULATE (
+            MAX ( 'DateTable'[Date] ),
+            FILTER (
+                ALL ( 'DateTable'[Date] ),
+                'DateTable'[Date] > CurrentPeriodStart &&
+                'DateTable'[Date] < CurrentPeriodEnd &&
+                NOT ISBLANK ( [SumDailyAggregation] )
+            )
+        )
+    RETURN
+        CALCULATE (
+            [SumDailyAggregation],
+            'DateTable'[Date] = PrevDate
+        )
+)
+
+EVALUATE
+    SUMMARIZECOLUMNS(
+        "SumDailySalesShifted", [SumDailySalesShifted]
+    )

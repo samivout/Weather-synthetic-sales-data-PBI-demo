@@ -1,0 +1,44 @@
+table D_Time
+	lineageTag: fd3f953d-4791-48af-b21b-4b8ee64e7c2b
+
+	column Hour
+		formatString: 0
+		lineageTag: ad5ae5ce-36b5-4753-9238-fb9ac31a4393
+		summarizeBy: none
+		sourceColumn: [Value]
+
+		annotation SummarizationSetBy = Automatic
+
+	column HourLabel
+		dataType: dateTime
+		formatString: Short Time
+		lineageTag: f9897cfd-cf90-4dbd-9ccc-d7923ff9f83e
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [HourLabel]
+		sortByColumn: Hour
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Time
+
+	column HourLabelLong
+		lineageTag: 91da4207-f0d8-4505-8281-3a7d4d996207
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [HourLabelLong]
+
+		annotation SummarizationSetBy = Automatic
+
+	partition D_Time = calculated
+		mode: import
+		source =
+				
+				ADDCOLUMNS(
+				    GENERATESERIES(0,23,1),
+				    "HourLabel", FORMAT([Value], "00") & ":00",
+				    "HourLabelLong", FORMAT([Value], " 00") & ":00 "
+				)
+
+	annotation PBI_Id = ddefaeff398441db9730b92b6843bbd8
+

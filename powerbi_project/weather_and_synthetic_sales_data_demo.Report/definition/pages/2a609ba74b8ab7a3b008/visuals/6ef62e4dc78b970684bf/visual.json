@@ -1,0 +1,208 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.4.0/schema.json",
+  "name": "6ef62e4dc78b970684bf",
+  "position": {
+    "x": 241.64880461665294,
+    "y": 291.24484748557296,
+    "z": 3000,
+    "height": 423.14921681780709,
+    "width": 842.07749381698272,
+    "tabOrder": 6000
+  },
+  "visual": {
+    "visualType": "ribbonChart",
+    "query": {
+      "queryState": {
+        "Category": {
+          "projections": [
+            {
+              "field": {
+                "HierarchyLevel": {
+                  "Expression": {
+                    "Hierarchy": {
+                      "Expression": {
+                        "SourceRef": {
+                          "Entity": "D_Date"
+                        }
+                      },
+                      "Hierarchy": "DayOfMonth Hierarchy"
+                    }
+                  },
+                  "Level": "Year"
+                }
+              },
+              "queryRef": "DateTable.DayOfMonth Hierarchy.Year",
+              "nativeQueryRef": "DayOfMonth Hierarchy Year",
+              "active": true
+            },
+            {
+              "field": {
+                "HierarchyLevel": {
+                  "Expression": {
+                    "Hierarchy": {
+                      "Expression": {
+                        "SourceRef": {
+                          "Entity": "D_Date"
+                        }
+                      },
+                      "Hierarchy": "DayOfMonth Hierarchy"
+                    }
+                  },
+                  "Level": "Quarter"
+                }
+              },
+              "queryRef": "DateTable.DayOfMonth Hierarchy.Quarter",
+              "nativeQueryRef": "DayOfMonth Hierarchy Quarter",
+              "active": true
+            },
+            {
+              "field": {
+                "HierarchyLevel": {
+                  "Expression": {
+                    "Hierarchy": {
+                      "Expression": {
+                        "SourceRef": {
+                          "Entity": "D_Date"
+                        }
+                      },
+                      "Hierarchy": "DayOfMonth Hierarchy"
+                    }
+                  },
+                  "Level": "MonthShort"
+                }
+              },
+              "queryRef": "DateTable.DayOfMonth Hierarchy.MonthShort",
+              "nativeQueryRef": "DayOfMonth Hierarchy MonthShort",
+              "active": true
+            },
+            {
+              "field": {
+                "HierarchyLevel": {
+                  "Expression": {
+                    "Hierarchy": {
+                      "Expression": {
+                        "SourceRef": {
+                          "Entity": "D_Date"
+                        }
+                      },
+                      "Hierarchy": "DayOfMonth Hierarchy"
+                    }
+                  },
+                  "Level": "Day of Month"
+                }
+              },
+              "queryRef": "DateTable.DayOfMonth Hierarchy.DayOfMonth",
+              "nativeQueryRef": "DayOfMonth Hierarchy DayOfMonth",
+              "active": true
+            },
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "D_Time"
+                    }
+                  },
+                  "Property": "HourLabel"
+                }
+              },
+              "queryRef": "DayTimeTable.HourLabel",
+              "nativeQueryRef": "HourLabel",
+              "active": false
+            }
+          ]
+        },
+        "Series": {
+          "projections": [
+            {
+              "field": {
+                "Column": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "D_Salesperson"
+                    }
+                  },
+                  "Property": "Name"
+                }
+              },
+              "queryRef": "salesperson_data.person_name",
+              "nativeQueryRef": "Person",
+              "displayName": "Person"
+            }
+          ]
+        },
+        "Y": {
+          "projections": [
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "Main_Measures"
+                    }
+                  },
+                  "Property": "Sales Aggregation"
+                }
+              },
+              "queryRef": "HourlyMeasureDefinitions.SelectedAtomicMeasure",
+              "nativeQueryRef": "Sales Aggregation"
+            }
+          ]
+        }
+      }
+    },
+    "objects": {
+      "valueAxis": [
+        {
+          "properties": {
+            "gridlineThickness": {
+              "expr": {
+                "Literal": {
+                  "Value": "3D"
+                }
+              }
+            },
+            "gridlineColor": {
+              "solid": {
+                "color": {
+                  "expr": {
+                    "ThemeDataColor": {
+                      "ColorId": 1,
+                      "Percent": 0.6
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      ],
+      "categoryAxis": [
+        {
+          "properties": {
+            "gridlineThickness": {
+              "expr": {
+                "Literal": {
+                  "Value": "3D"
+                }
+              }
+            },
+            "gridlineColor": {
+              "solid": {
+                "color": {
+                  "expr": {
+                    "ThemeDataColor": {
+                      "ColorId": 1,
+                      "Percent": 0.6
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      ]
+    },
+    "drillFilterOtherVisuals": true
+  }
+}

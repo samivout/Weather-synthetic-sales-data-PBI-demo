@@ -1,0 +1,14 @@
+EVALUATE
+	VAR __TABLE =
+    TOPN(
+        5,
+        ADDCOLUMNS(
+            'Product',
+            "SalesAgg", [Sales Aggregation]
+        ),
+        [Sales Aggregation],
+        DESC
+    )
+
+RETURN
+	__TABLE

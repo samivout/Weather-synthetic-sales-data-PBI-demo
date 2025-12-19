@@ -1,0 +1,9 @@
+EVALUATE
+    VAR SumSales = 
+	CALCULATE(
+		 [SalesSum],
+		 DateAggregation[Calculation group column] = "Median By Date"
+	)
+
+RETURN
+ROW("SumSales", SumSales)

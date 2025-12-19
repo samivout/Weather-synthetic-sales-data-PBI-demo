@@ -1,0 +1,427 @@
+{
+  "version": "1.1.0",
+  "diagrams": [
+    {
+      "ordinal": 0,
+      "scrollPosition": {
+        "x": 2518.6812307920572,
+        "y": 0
+      },
+      "nodes": [
+        {
+          "location": {
+            "x": 2892.1536034829787,
+            "y": 516.50842274314186
+          },
+          "nodeIndex": "LocationAggregation",
+          "size": {
+            "height": 128,
+            "width": 234
+          },
+          "zIndex": 0
+        },
+        {
+          "location": {
+            "x": 2965.2564630557549,
+            "y": 516.50842274314186
+          },
+          "nodeIndex": "DateAggregation",
+          "size": {
+            "height": 128,
+            "width": 234
+          },
+          "zIndex": 0
+        },
+        {
+          "location": {
+            "x": 3111.4621822013073,
+            "y": 516.50842274314186
+          },
+          "nodeIndex": "Location Common Open Hours",
+          "size": {
+            "height": 128,
+            "width": 234
+          },
+          "zIndex": 0
+        },
+        {
+          "location": {
+            "x": 3184.5650417740835,
+            "y": 516.50842274314186
+          },
+          "nodeIndex": "Location Common Open Days",
+          "size": {
+            "height": 128,
+            "width": 234
+          },
+          "zIndex": 0
+        },
+        {
+          "location": {
+            "x": 3330.7707609196359,
+            "y": 516.50842274314186
+          },
+          "nodeIndex": "RemoveWeatherDuplicates",
+          "size": {
+            "height": 128,
+            "width": 234
+          },
+          "zIndex": 0
+        },
+        {
+          "location": {
+            "x": 3476.9764800651883,
+            "y": 516.50842274314186
+          },
+          "nodeIndex": "HourAggregation",
+          "size": {
+            "height": 128,
+            "width": 234
+          },
+          "zIndex": 0
+        },
+        {
+          "location": {
+            "x": 3550.0793396379645,
+            "y": 516.50842274314186
+          },
+          "nodeIndex": "PersonAggregation",
+          "size": {
+            "height": 128,
+            "width": 234
+          },
+          "zIndex": 0
+        },
+        {
+          "location": {
+            "x": 4134.9022162201745,
+            "y": 516.50842274314186
+          },
+          "nodeIndex": "ProductAggregation",
+          "nodeLineageTag": "16c4ef73-50b9-421d-827c-0404b3cdeec4",
+          "size": {
+            "height": 128,
+            "width": 234
+          },
+          "zIndex": 0
+        },
+        {
+          "location": {
+            "x": 4208.00507579295,
+            "y": 516.50842274314186
+          },
+          "nodeIndex": "HourAggregationTemporalFirst",
+          "nodeLineageTag": "b20206a8-76b9-463d-b718-cec699216ae6",
+          "size": {
+            "height": 128,
+            "width": 234
+          },
+          "zIndex": 0
+        },
+        {
+          "location": {
+            "x": 4281.107935365726,
+            "y": 516.50842274314186
+          },
+          "nodeIndex": "DateAggregationTemporalFirst",
+          "nodeLineageTag": "e6140dae-93a3-4e93-b7bd-d0a42241df45",
+          "size": {
+            "height": 128,
+            "width": 234
+          },
+          "zIndex": 0
+        },
+        {
+          "location": {
+            "x": 4354.2107949385017,
+            "y": 516.50842274314186
+          },
+          "nodeIndex": "ProductAggregationTemporalFirst",
+          "nodeLineageTag": "16c4ef73-50b9-421d-827c-0404b3cdeec6",
+          "size": {
+            "height": 128,
+            "width": 234
+          },
+          "zIndex": 0
+        },
+        {
+          "location": {
+            "x": 4427.3136545112775,
+            "y": 516.50842274314186
+          },
+          "nodeIndex": "PersonAggregationTemporalFirst",
+          "nodeLineageTag": "d2a948d7-bd1b-4530-8a87-19cfc71ead69",
+          "size": {
+            "height": 128,
+            "width": 234
+          },
+          "zIndex": 0
+        },
+        {
+          "location": {
+            "x": 4500.4165140840532,
+            "y": 516.50842274314186
+          },
+          "nodeIndex": "LocationAggregationTemporalFirst",
+          "nodeLineageTag": "16c4ef73-50b9-421d-827c-0404b3cdeec8",
+          "size": {
+            "height": 128,
+            "width": 234
+          },
+          "zIndex": 0
+        },
+        {
+          "location": {
+            "x": 3257.6679013468597,
+            "y": 516.50842274314186
+          },
+          "nodeIndex": "Use Full Axis",
+          "size": {
+            "height": 128,
+            "width": 234
+          },
+          "zIndex": 0
+        },
+        {
+          "location": {
+            "x": 5012.1365310934834,
+            "y": 516.50842274314186
+          },
+          "nodeIndex": "WeatherIndexAggregation",
+          "nodeLineageTag": "16c4ef73-50b9-421d-827c-0404b3cdeec9",
+          "size": {
+            "height": 128,
+            "width": 234
+          },
+          "zIndex": 0
+        },
+        {
+          "location": {
+            "x": 5085.2393906662592,
+            "y": 516.50842274314186
+          },
+          "nodeIndex": "WeatherIndexAggregationTemporalFirst",
+          "nodeLineageTag": "16c4ef73-50b9-421d-827c-0404b3cdeec7",
+          "size": {
+            "height": 128,
+            "width": 234
+          },
+          "zIndex": 0
+        },
+        {
+          "location": {
+            "x": 1476.7034546089021,
+            "y": 0
+          },
+          "nodeIndex": "D_Location",
+          "size": {
+            "height": 224,
+            "width": 234
+          },
+          "zIndex": 0
+        },
+        {
+          "location": {
+            "x": 210.89714042722397,
+            "y": 913.01684548628361
+          },
+          "nodeIndex": "D_Salesperson",
+          "size": {
+            "height": 248,
+            "width": 234
+          },
+          "zIndex": 0
+        },
+        {
+          "location": {
+            "x": 762.07952872397129,
+            "y": 25.276560949228383
+          },
+          "nodeIndex": "D_Product_Category",
+          "size": {
+            "height": 158.02192182249001,
+            "width": 234
+          },
+          "zIndex": 0
+        },
+        {
+          "location": {
+            "x": 222.55650612259444,
+            "y": 8.7422786201406382
+          },
+          "nodeIndex": "D_Product",
+          "size": {
+            "height": 185.18212411959422,
+            "width": 234
+          },
+          "zIndex": 0
+        },
+        {
+          "location": {
+            "x": 1803.6039414430616,
+            "y": 502.62983882287142
+          },
+          "nodeIndex": "D_Date",
+          "size": {
+            "height": 200,
+            "width": 234
+          },
+          "zIndex": 0
+        },
+        {
+          "location": {
+            "x": 1804.0221481824408,
+            "y": 760.18632603686456
+          },
+          "nodeIndex": "D_Time",
+          "size": {
+            "height": 145,
+            "width": 234
+          },
+          "zIndex": 0
+        },
+        {
+          "location": {
+            "x": 761.190546862736,
+            "y": 493.00842274314181
+          },
+          "nodeIndex": "F_Sales",
+          "size": {
+            "height": 200,
+            "width": 234
+          },
+          "zIndex": 0
+        },
+        {
+          "location": {
+            "x": 5304.5479693845864,
+            "y": 528.50842274314186
+          },
+          "nodeIndex": "Main_Measures",
+          "size": {
+            "height": 104,
+            "width": 234
+          },
+          "zIndex": 0
+        },
+        {
+          "location": {
+            "x": 4573.519373656829,
+            "y": 528.50842274314186
+          },
+          "nodeIndex": "L_Atomic_Measure_Names",
+          "size": {
+            "height": 104,
+            "width": 234
+          },
+          "zIndex": 0
+        },
+        {
+          "location": {
+            "x": 5377.6508289573621,
+            "y": 528.50842274314186
+          },
+          "nodeIndex": "Support_Measures",
+          "nodeLineageTag": "c279b735-2ae8-4e47-8ea6-ca6b672f021b",
+          "size": {
+            "height": 104,
+            "width": 234
+          },
+          "zIndex": 0
+        },
+        {
+          "location": {
+            "x": 3038.3593226285311,
+            "y": 480.50842274314186
+          },
+          "nodeIndex": "L_Color_Scale_Value",
+          "size": {
+            "height": 200,
+            "width": 234
+          },
+          "zIndex": 0
+        },
+        {
+          "location": {
+            "x": 5231.4451098118107,
+            "y": 480.50842274314186
+          },
+          "nodeIndex": "L_Top_N_Products",
+          "size": {
+            "height": 200,
+            "width": 234
+          },
+          "zIndex": 0
+        },
+        {
+          "location": {
+            "x": 1119.8383508593786,
+            "y": 9.6382804746142412
+          },
+          "nodeIndex": "D_Weather_Index_Bins",
+          "size": {
+            "height": 200,
+            "width": 234
+          },
+          "zIndex": 0
+        },
+        {
+          "location": {
+            "x": 5158.3422502390349,
+            "y": 504.50842274314186
+          },
+          "nodeIndex": "Aggregation Dimensions Fieldparameters",
+          "size": {
+            "height": 152,
+            "width": 234
+          },
+          "zIndex": 0
+        },
+        {
+          "location": {
+            "x": 3623.1821992107407,
+            "y": 468.50842274314186
+          },
+          "nodeIndex": "Aggregation Type Inclusion",
+          "size": {
+            "height": 224,
+            "width": 234
+          },
+          "zIndex": 0
+        },
+        {
+          "location": {
+            "x": 3696.2850587835169,
+            "y": 492.50842274314186
+          },
+          "nodeIndex": "Calculation Group Inclusion",
+          "size": {
+            "height": 176,
+            "width": 234
+          },
+          "zIndex": 0
+        },
+        {
+          "location": {
+            "x": 767.47475682687707,
+            "y": 246.39612774623407
+          },
+          "nodeIndex": "F_Product_Location",
+          "size": {
+            "height": 150.1214160797295,
+            "width": 234
+          },
+          "zIndex": 0
+        }
+      ],
+      "name": "All tables",
+      "zoomValue": 63.287087723234038,
+      "pinKeyFieldsToTop": false,
+      "showExtraHeaderInfo": false,
+      "hideKeyFieldsWhenCollapsed": false,
+      "tablesLocked": false
+    }
+  ],
+  "selectedDiagram": "All tables",
+  "defaultDiagram": "All tables"
+}

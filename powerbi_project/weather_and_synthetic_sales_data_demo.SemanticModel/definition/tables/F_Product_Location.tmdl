@@ -1,0 +1,35 @@
+table F_Product_Location
+	lineageTag: 83bb159a-5f35-4e46-8f49-10e5be74fa41
+
+	column product_id
+		dataType: int64
+		formatString: 0
+		lineageTag: 90d6c2ee-2773-4d08-b21a-0cfd505de4ee
+		summarizeBy: none
+		sourceColumn: product_id
+
+		annotation SummarizationSetBy = Automatic
+
+	column location_id
+		dataType: int64
+		formatString: 0
+		lineageTag: 1ddc908c-c9d1-4c9c-94e4-5565aba0b0e4
+		summarizeBy: none
+		sourceColumn: location_id
+
+		annotation SummarizationSetBy = Automatic
+
+	partition F_Product_Location = m
+		mode: import
+		source =
+				let
+				    Source = Parquet.Document(File.Contents("file:///C:/dev/data/delta/test_product_location_data_latest.parquet"), [Compression=null, LegacyColumnNameEncoding=false, MaxDepth=null])
+				in
+				    Source
+
+	changedProperty = Name
+
+	annotation PBI_NavigationStepName = Navigation
+
+	annotation PBI_ResultType = Table
+

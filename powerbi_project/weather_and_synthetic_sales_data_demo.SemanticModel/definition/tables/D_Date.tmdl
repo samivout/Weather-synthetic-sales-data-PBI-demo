@@ -1,0 +1,263 @@
+table D_Date
+	lineageTag: 4875edd7-f2d3-44e2-9fb1-de7621a1d235
+	dataCategory: Time
+
+	column Date
+		isKey
+		formatString: Short Date
+		lineageTag: 8da27377-210f-461f-9b54-1d27ac5f17cf
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [Date]
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	column DateAsInteger
+		lineageTag: ba07f368-f5e0-4c0f-8217-fd7a3b4b6c3d
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [DateAsInteger]
+
+		annotation SummarizationSetBy = Automatic
+
+	column Year
+		formatString: 0
+		lineageTag: fc108372-2d1f-4241-ae96-ea3f0a0ba737
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [Year]
+
+		annotation SummarizationSetBy = Automatic
+
+	column MonthNo
+		formatString: 0
+		lineageTag: 98b4a154-1bb8-4651-b4f2-09d24b058dea
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [MonthNo]
+
+		annotation SummarizationSetBy = Automatic
+
+	column YearMonthNo
+		lineageTag: 1ac035c8-afcd-47f1-a8bc-f9bf0b5ffd9c
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [YearMonthNo]
+
+		annotation SummarizationSetBy = Automatic
+
+	column YearMonth
+		lineageTag: 3ea1fc88-55ef-4d7b-b110-51aae758735a
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [YearMonth]
+
+		annotation SummarizationSetBy = Automatic
+
+	column MonthShort
+		lineageTag: bfa0fd42-8c80-47ad-a7a6-ec17e20769ee
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [MonthShort]
+		sortByColumn: MonthNo
+
+		annotation SummarizationSetBy = Automatic
+
+	column MonthLong
+		lineageTag: 4ec7ba3c-48ec-46cd-8299-21ed900cb921
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [MonthLong]
+
+		annotation SummarizationSetBy = Automatic
+
+	column WeekNo
+		formatString: 0
+		lineageTag: 94435e8b-550c-47dc-8dbc-cf433838abd5
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [WeekNo]
+
+		annotation SummarizationSetBy = Automatic
+
+	column WeekDay
+		lineageTag: 11001586-a788-4b9b-be10-7109eeb3fa01
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [WeekDay]
+
+		annotation SummarizationSetBy = Automatic
+
+	column WeekDayShort
+		lineageTag: 9c9ec2a9-4458-4a39-8704-996ee90919ac
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [WeekDayShort]
+
+		annotation SummarizationSetBy = Automatic
+
+	column Quarter
+		lineageTag: acf8a0db-afbe-4184-b497-733b5a54ebf4
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [Quarter]
+		sortByColumn: QuarterNumber
+
+		annotation SummarizationSetBy = Automatic
+
+	column Year/Quarter
+		lineageTag: 89939689-47e0-4932-8673-1ec174b9a0d9
+		summarizeBy: none
+		sourceColumn: [YearQuarter]
+
+		annotation SummarizationSetBy = Automatic
+
+	column MonthDate
+		lineageTag: 310fe876-d2e6-477b-8603-6cdc739743be
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [MonthDate]
+
+		annotation SummarizationSetBy = Automatic
+
+	column IsActive
+		formatString: 0
+		lineageTag: 84cd211e-18f8-4936-be7a-20850d778f94
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [IsActive]
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Day of Month'
+		formatString: 0
+		lineageTag: 189d6e46-21ff-45b0-9822-1ef637fbc619
+		summarizeBy: none
+		sourceColumn: [DayOfMonth]
+
+		annotation SummarizationSetBy = Automatic
+
+	column QuarterNumber
+		formatString: 0
+		lineageTag: 3e82daf7-1ad1-475c-9b4c-8df73fe1c4ea
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [QuarterNumber]
+
+		annotation SummarizationSetBy = Automatic
+
+	column WeekOfYear
+		formatString: 0
+		lineageTag: 3c6597d4-5a1c-42bc-aba1-a33b9138465f
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [WeekOfYear]
+
+		annotation SummarizationSetBy = Automatic
+
+	column YearQuarterInteger
+		dataType: int64
+		formatString: 0
+		lineageTag: 11329565-dd9e-448c-8c93-f099741ec8c8
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [YearQuarterInteger]
+
+		annotation SummarizationSetBy = Automatic
+
+	column YearMonthInteger
+		dataType: int64
+		formatString: 0
+		lineageTag: 1de04270-c3d5-4ea8-b890-5dddbfe8e330
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [YearMonthInteger]
+
+		annotation SummarizationSetBy = Automatic
+
+	column YearWeekInteger
+		dataType: int64
+		formatString: 0
+		lineageTag: fd62fade-90b7-4047-85cd-152357a5cc5e
+		summarizeBy: none
+		isNameInferred
+		sourceColumn: [YearWeekInteger]
+
+		annotation SummarizationSetBy = Automatic
+
+	hierarchy 'Date Hierarchy'
+		lineageTag: 8308518d-f47b-4cde-be5d-6c885d75488c
+
+		level Year
+			lineageTag: c0bff762-3e62-4bfa-9739-b86fd4b0d70d
+			column: Year
+
+		level Quarter
+			lineageTag: a386e8f9-a954-4f3b-8463-d2ef31f333d3
+			column: Quarter
+
+		level MonthNo
+			lineageTag: 6cd96b91-90cd-463c-9482-2af8e784a4b2
+			column: MonthNo
+
+		level WeekOfYear
+			lineageTag: 94ddc66a-19c1-497b-858d-dd3bd7376b65
+			column: WeekOfYear
+
+		level Date
+			lineageTag: f620a5ac-18fb-404e-b1af-f82c7f62dd54
+			column: Date
+
+	hierarchy 'DayOfMonth Hierarchy'
+		lineageTag: 86997c9e-21ef-420c-9196-7fabbbcf2154
+
+		level Year
+			lineageTag: e3f4cc2f-8f46-4e32-8a78-c37abb09156b
+			column: Year
+
+		level Quarter
+			lineageTag: e086ff9b-e799-4436-9f5c-9da9867e7acb
+			column: Quarter
+
+		level MonthShort
+			lineageTag: 7b078134-0593-4295-b409-742b71d41cd8
+			column: MonthShort
+
+		level 'Day of Month'
+			lineageTag: 05d5c066-2147-469f-b7f7-e52372262e3c
+			column: 'Day of Month'
+
+	partition D_Date = calculated
+		mode: import
+		source = ```
+				
+				ADDCOLUMNS ( 
+				CALENDAR(MINX('F_Sales','F_Sales'[Date]),MAXX('F_Sales','F_Sales'[Date])),
+				"DateAsInteger", FORMAT ( [date], "YYYYMMDD" ),
+				"Year", YEAR ( [date] ),
+				"MonthNo", MONTH([Date]), 
+				"YearMonthNo", FORMAT ( [date], "YYYY/MM" ), 
+				"YearMonth", FORMAT ( [date], "YYYY/mmm" ),
+				"YearMonthInteger", FORMAT ( [date], "YYYYmm" ), 
+				"MonthShort", FORMAT ( [date], "mmm" ),
+				"MonthLong", FORMAT ( [date], "mmmm" ),
+				"DayOfMonth", DAY([Date]), 
+				"WeekNo", WEEKDAY ( [date] ), 
+				"MonthDate", FORMAT( [date], "mm/dd"),
+				"WeekDay", FORMAT ( [date], "dddd" ), 
+				"WeekDayShort", FORMAT ( [date], "ddd" ), 
+				"Quarter", "Q" & FORMAT ( [date], "Q" ),
+				"QuarterNumber", QUARTER([Date]), 
+				"YearQuarter", FORMAT ( [date], "YYYY" ) & "/Q" & FORMAT ( [date], "Q" ),
+				"YearQuarterInteger", FORMAT ( [date], "YYYY" ) & FORMAT ( [date], "Q" ),
+				"IsActive", IF(MONTH([date]) IN {5,6,7,8,9}, 1, 0),
+				"WeekOfYear", WEEKNUM([Date], 2),
+				"YearWeekInteger", FORMAT([Date], "YYYY") & WEEKNUM([Date], 2)
+				)
+				
+				```
+
+	annotation PBI_Id = b90969333bf84c71b429cddf85438faa
+

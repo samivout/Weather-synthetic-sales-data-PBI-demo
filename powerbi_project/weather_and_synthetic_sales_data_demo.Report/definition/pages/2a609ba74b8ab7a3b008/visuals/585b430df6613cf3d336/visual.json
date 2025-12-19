@@ -1,0 +1,16 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.4.0/schema.json",
+  "name": "585b430df6613cf3d336",
+  "position": {
+    "x": 1084.6939669063854,
+    "y": 103.81734524909778,
+    "z": 5000,
+    "height": 415.02067824648469,
+    "width": 191.59430929090297,
+    "tabOrder": 1000
+  },
+  "visualGroup": {
+    "displayName": "Data Aggregation Controls",
+    "groupMode": "ScaleMode"
+  }
+}

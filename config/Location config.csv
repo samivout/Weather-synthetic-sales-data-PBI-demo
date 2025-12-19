@@ -1,0 +1,11 @@
+location_id;location_name;open_hours_start;open_hours_end;open_days_start;open_days_end;sales_max
+1;Helsinki;8;16;0;4;120
+2;Turku;9;18;1;5;180
+3;Kouvola;8;17;0;6;75
+4;Kuopio;10;20;2;6;150
+5;Oulu;8;16;0;5;90
+6;Joensuu;11;19;1;6;130
+7;Lahti;7;15;0;4;65
+8;Kajaani;8;18;2;6;200
+9;Kokkola;9;17;0;5;110
+10;Vaasa;8;16;1;6;95

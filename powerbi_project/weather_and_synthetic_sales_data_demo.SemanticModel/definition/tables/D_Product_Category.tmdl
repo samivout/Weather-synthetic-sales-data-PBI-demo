@@ -1,0 +1,32 @@
+table D_Product_Category
+	lineageTag: d407d150-cd66-4629-b558-3e27d61e7886
+
+	column category_id
+		dataType: int64
+		formatString: 0
+		lineageTag: cf3da5a4-8890-4125-a62d-e4e4d94a122b
+		summarizeBy: none
+		sourceColumn: category_id
+
+		annotation SummarizationSetBy = Automatic
+
+	column category_name
+		dataType: string
+		lineageTag: 5c6cf6ab-754e-42d3-9a0b-c8d756941af6
+		summarizeBy: none
+		sourceColumn: category_name
+
+		annotation SummarizationSetBy = Automatic
+
+	partition D_Product_Category = m
+		mode: import
+		source =
+				let
+				    Source = Parquet.Document(File.Contents("file:///C:/dev/data/delta/test_product_category_data_latest.parquet"), [Compression=null, LegacyColumnNameEncoding=false, MaxDepth=null])
+				in
+				    Source
+
+	changedProperty = Name
+
+	annotation PBI_ResultType = Table
+

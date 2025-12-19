@@ -1,0 +1,384 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.4.0/schema.json",
+  "name": "675b2f783ef7ca52ecde",
+  "position": {
+    "x": 197.4129353233831,
+    "y": 105.07462686567165,
+    "z": 6000,
+    "height": 330.08291873963515,
+    "width": 664.4112769485904,
+    "tabOrder": 6000
+  },
+  "visual": {
+    "visualType": "lineChart",
+    "query": {
+      "queryState": {
+        "Category": {
+          "projections": [
+            {
+              "field": {
+                "HierarchyLevel": {
+                  "Expression": {
+                    "Hierarchy": {
+                      "Expression": {
+                        "SourceRef": {
+                          "Entity": "D_Date"
+                        }
+                      },
+                      "Hierarchy": "DayOfMonth Hierarchy"
+                    }
+                  },
+                  "Level": "Year"
+                }
+              },
+              "queryRef": "DateTable.DayOfMonth Hierarchy.Year",
+              "nativeQueryRef": "DayOfMonth Hierarchy Year",
+              "active": true
+            },
+            {
+              "field": {
+                "HierarchyLevel": {
+                  "Expression": {
+                    "Hierarchy": {
+                      "Expression": {
+                        "SourceRef": {
+                          "Entity": "D_Date"
+                        }
+                      },
+                      "Hierarchy": "DayOfMonth Hierarchy"
+                    }
+                  },
+                  "Level": "Quarter"
+                }
+              },
+              "queryRef": "DateTable.DayOfMonth Hierarchy.Quarter",
+              "nativeQueryRef": "DayOfMonth Hierarchy Quarter",
+              "active": true
+            },
+            {
+              "field": {
+                "HierarchyLevel": {
+                  "Expression": {
+                    "Hierarchy": {
+                      "Expression": {
+                        "SourceRef": {
+                          "Entity": "D_Date"
+                        }
+                      },
+                      "Hierarchy": "DayOfMonth Hierarchy"
+                    }
+                  },
+                  "Level": "MonthShort"
+                }
+              },
+              "queryRef": "DateTable.DayOfMonth Hierarchy.MonthShort",
+              "nativeQueryRef": "DayOfMonth Hierarchy MonthShort",
+              "active": true
+            },
+            {
+              "field": {
+                "HierarchyLevel": {
+                  "Expression": {
+                    "Hierarchy": {
+                      "Expression": {
+                        "SourceRef": {
+                          "Entity": "D_Date"
+                        }
+                      },
+                      "Hierarchy": "DayOfMonth Hierarchy"
+                    }
+                  },
+                  "Level": "Day of Month"
+                }
+              },
+              "queryRef": "DateTable.DayOfMonth Hierarchy.DayOfMonth",
+              "nativeQueryRef": "DayOfMonth Hierarchy DayOfMonth",
+              "active": true
+            }
+          ]
+        },
+        "Y": {
+          "projections": [
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "Main_Measures"
+                    }
+                  },
+                  "Property": "Location-averaged Sales Aggregation"
+                }
+              },
+              "queryRef": "HourlyMeasureDefinitions.Location-averaged Average Sales Aggregation",
+              "nativeQueryRef": "Location-averaged Sales Aggregation"
+            }
+          ]
+        },
+        "Y2": {
+          "projections": [
+            {
+              "field": {
+                "Measure": {
+                  "Expression": {
+                    "SourceRef": {
+                      "Entity": "Main_Measures"
+                    }
+                  },
+                  "Property": "Location-averaged Average Weather Index"
+                }
+              },
+              "queryRef": "HourlyMeasureDefinitions.Location-averaged Average Weather Index",
+              "nativeQueryRef": "Location-averaged Average Weather Index"
+            }
+          ]
+        }
+      }
+    },
+    "objects": {
+      "error": [
+        {
+          "properties": {
+            "enabled": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
+                }
+              }
+            },
+            "shadeShow": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
+                }
+              }
+            }
+          },
+          "selector": {
+            "metadata": "HourlyMeasureDefinitions.Location-averaged Average Sales Aggregation"
+          }
+        },
+        {
+          "properties": {
+            "enabled": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
+                }
+              }
+            },
+            "shadeShow": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
+                }
+              }
+            }
+          },
+          "selector": {
+            "metadata": "HourlyMeasureDefinitions.Location-averaged Average Weather Index"
+          }
+        },
+        {
+          "properties": {
+            "errorRange": {
+              "kind": "ErrorRange",
+              "symmetricalExplicit": {
+                "delta": {
+                  "expr": {
+                    "Measure": {
+                      "Expression": {
+                        "SourceRef": {
+                          "Entity": "Main_Measures"
+                        }
+                      },
+                      "Property": "Location-Sdev of Average Weather Index"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "selector": {
+            "data": [
+              {
+                "dataViewWildcard": {
+                  "matchingOption": 0
+                }
+              }
+            ],
+            "metadata": "HourlyMeasureDefinitions.Location-averaged Average Weather Index",
+            "highlightMatching": 1
+          }
+        },
+        {
+          "properties": {
+            "errorRange": {
+              "kind": "ErrorRange",
+              "symmetricalExplicit": {
+                "delta": {
+                  "expr": {
+                    "Measure": {
+                      "Expression": {
+                        "SourceRef": {
+                          "Entity": "Main_Measures"
+                        }
+                      },
+                      "Property": "Location-Sdev of Average Weather Index"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "selector": {
+            "data": [
+              {
+                "dataViewWildcard": {
+                  "matchingOption": 0
+                }
+              }
+            ],
+            "metadata": "HourlyMeasureDefinitions.Location-averaged Average Sales Aggregation",
+            "highlightMatching": 1
+          }
+        }
+      ],
+      "referenceLine": [
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
+                }
+              }
+            },
+            "displayName": {
+              "expr": {
+                "Literal": {
+                  "Value": "'Average line 1'"
+                }
+              }
+            },
+            "value": {
+              "expr": {
+                "Aggregation": {
+                  "Expression": {
+                    "SelectRef": {
+                      "ExpressionName": "HourlyMeasureDefinitions.Location-averaged Average Sales Aggregation"
+                    }
+                  },
+                  "Function": 1
+                }
+              }
+            },
+            "dataLabelShow": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
+                }
+              }
+            }
+          },
+          "selector": {
+            "metadata": "HourlyMeasureDefinitions.Location-averaged Average Sales Aggregation",
+            "id": "1"
+          }
+        },
+        {
+          "properties": {
+            "show": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
+                }
+              }
+            },
+            "displayName": {
+              "expr": {
+                "Literal": {
+                  "Value": "'Average line 2'"
+                }
+              }
+            },
+            "value": {
+              "expr": {
+                "Aggregation": {
+                  "Expression": {
+                    "SelectRef": {
+                      "ExpressionName": "HourlyMeasureDefinitions.Location-averaged Average Weather Index"
+                    }
+                  },
+                  "Function": 1
+                }
+              }
+            },
+            "dataLabelShow": {
+              "expr": {
+                "Literal": {
+                  "Value": "true"
+                }
+              }
+            }
+          },
+          "selector": {
+            "metadata": "HourlyMeasureDefinitions.Location-averaged Average Weather Index",
+            "id": "2"
+          }
+        }
+      ],
+      "valueAxis": [
+        {
+          "properties": {
+            "gridlineColor": {
+              "solid": {
+                "color": {
+                  "expr": {
+                    "ThemeDataColor": {
+                      "ColorId": 1,
+                      "Percent": 0.6
+                    }
+                  }
+                }
+              }
+            },
+            "gridlineThickness": {
+              "expr": {
+                "Literal": {
+                  "Value": "3D"
+                }
+              }
+            }
+          }
+        }
+      ],
+      "categoryAxis": [
+        {
+          "properties": {
+            "gridlineThickness": {
+              "expr": {
+                "Literal": {
+                  "Value": "3D"
+                }
+              }
+            },
+            "gridlineColor": {
+              "solid": {
+                "color": {
+                  "expr": {
+                    "ThemeDataColor": {
+                      "ColorId": 1,
+                      "Percent": 0.6
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      ]
+    },
+    "drillFilterOtherVisuals": true
+  }
+}

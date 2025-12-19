@@ -1,0 +1,141 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.4.0/schema.json",
+  "name": "c6f1ad5e01cca8a1983e",
+  "position": {
+    "x": 9.6421845574387941,
+    "y": 9.03954802259887,
+    "z": 0,
+    "height": 296.49717514124291,
+    "width": 630.35781544256122,
+    "tabOrder": 0
+  },
+  "visual": {
+    "visualType": "textbox",
+    "objects": {
+      "general": [
+        {
+          "properties": {
+            "paragraphs": [
+              {
+                "textRuns": [
+                  {
+                    "value": "Attributions and disclaimers:",
+                    "textStyle": {
+                      "fontWeight": "bold"
+                    }
+                  }
+                ]
+              },
+              {
+                "textRuns": [
+                  {
+                    "value": ""
+                  }
+                ]
+              },
+              {
+                "textRuns": [
+                  {
+                    "value": "Weather data source",
+                    "textStyle": {
+                      "fontWeight": "bold"
+                    }
+                  },
+                  {
+                    "value": ": Finnish Meteorological Institute (FMI), CC BY 4.0, "
+                  },
+                  {
+                    "value": "https://creativecommons.org/licenses/by/4.0/",
+                    "textStyle": {},
+                    "url": "https://creativecommons.org/licenses/by/4.0/"
+                  }
+                ]
+              },
+              {
+                "textRuns": [
+                  {
+                    "value": ""
+                  }
+                ]
+              },
+              {
+                "textRuns": [
+                  {
+                    "value": "The hourly average temperature and hourly accumulated rain data contained in the F_Sales table has been reproduced as-is based on the data obtained form FMI's Open Data Web API. The weather index value used in this report is calculated based on these values and the visualizations and computations may further process and aggregate the data. "
+                  }
+                ]
+              },
+              {
+                "textRuns": [
+                  {
+                    "value": ""
+                  }
+                ]
+              },
+              {
+                "textRuns": [
+                  {
+                    "value": "Other data: ",
+                    "textStyle": {
+                      "fontWeight": "bold"
+                    }
+                  },
+                  {
+                    "value": "Excluding weather data, all data in this report and the source repository are "
+                  },
+                  {
+                    "value": "synthetic",
+                    "textStyle": {
+                      "fontWeight": "bold"
+                    }
+                  },
+                  {
+                    "value": ". Any person names, company names, product names, or sales figures are "
+                  },
+                  {
+                    "value": "entirely fictitious",
+                    "textStyle": {
+                      "fontWeight": "bold"
+                    }
+                  },
+                  {
+                    "value": " and are used for demonstration purposes only. "
+                  }
+                ]
+              },
+              {
+                "textRuns": [
+                  {
+                    "value": ""
+                  }
+                ]
+              },
+              {
+                "textRuns": [
+                  {
+                    "value": "'Deneb: Declarative Visualizations in Power BI': ",
+                    "textStyle": {
+                      "fontWeight": "bold"
+                    }
+                  },
+                  {
+                    "value": "This report contains some visualizations created using the third-party software by Daniel Marsh-Patrick provided under the MIT License, available on the Microsoft AppSource / Power BI Marketplace and "
+                  },
+                  {
+                    "value": "https://github.com/deneb-viz/deneb",
+                    "textStyle": {},
+                    "url": "https://github.com/deneb-viz/deneb"
+                  },
+                  {
+                    "value": " ."
+                  }
+                ]
+              }
+            ]
+          }
+        }
+      ]
+    },
+    "drillFilterOtherVisuals": true
+  }
+}

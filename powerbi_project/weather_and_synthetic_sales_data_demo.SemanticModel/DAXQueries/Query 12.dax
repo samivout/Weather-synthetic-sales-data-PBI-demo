@@ -1,0 +1,28 @@
+EVALUATE
+VAR CurKey = 
+    CALCULATE(
+        MAX('DateTable'[YearMonthInteger]),
+        'DateTable'[MonthNo] < 8
+    )
+VAR PrevKey =
+    CALCULATE (
+        MAX('DateTable'[YearMonthInteger]),
+        FILTER (
+            ALL('DateTable'[YearMonthInteger]),
+            'DateTable'[YearMonthInteger] < CurKey &&
+            NOT ISBLANK([SumDailyAggregation])
+        )
+    )
+//RETURN
+//    ROW(
+//        "REE",
+//        CurKey
+//    )
+
+RETURN
+ROW("Ree",
+    CALCULATE (
+        [SumDailyAggregation],
+        'DateTable'[YearMonthInteger] = CurKey
+    )
+)

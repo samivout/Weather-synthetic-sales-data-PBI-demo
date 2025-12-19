@@ -1,0 +1,301 @@
+table DateAggregationTemporalFirst
+	lineageTag: e6140dae-93a3-4e93-b7bd-d0a42241df45
+
+	calculationGroup
+		precedence: 120
+
+		calculationItem None = SELECTEDMEASURE()
+
+		calculationItem 'Sum By Date' = ```
+				
+				Var Dates =
+				    VALUES('F_Sales'[Date])
+				
+				Var CalcByDate =
+				    ADDCOLUMNS(
+				        Dates,
+				        "MeasureValue", CALCULATE(SELECTEDMEASURE())
+				    )
+				
+				VAR InclusionCheck = SELECTEDMEASURENAME() IN VALUES('Calculation Group Inclusion'[DateAggregation]) && 
+				                     SELECTEDMEASURENAME() IN VALUES('Aggregation Type Inclusion'[Sum])
+				
+				VAR MeasureEvaluation =
+				    IF(
+				        InclusionCheck,
+				        SUMX(CalcByDate, [MeasureValue]),
+				        SELECTEDMEASURE()
+				    )
+				    
+				RETURN
+				    MeasureEvaluation
+				```
+
+		calculationItem 'Average By Date' = ```
+				
+				Var Dates =
+				    VALUES('F_Sales'[Date])
+				
+				Var CalcByDate =
+				    ADDCOLUMNS(
+				        Dates,
+				        "MeasureValue", CALCULATE(SELECTEDMEASURE())
+				    )
+				
+				VAR InclusionCheck = SELECTEDMEASURENAME() IN VALUES('Calculation Group Inclusion'[DateAggregation]) && 
+				                     SELECTEDMEASURENAME() IN VALUES('Aggregation Type Inclusion'[Average])
+				
+				VAR MeasureEvaluation =
+				    IF(
+				        InclusionCheck,
+				        AVERAGEX(CalcByDate, [MeasureValue]),
+				        SELECTEDMEASURE()
+				    )
+				    
+				RETURN
+				    MeasureEvaluation
+				```
+
+		calculationItem 'Weighted Average By Date' = ```
+				
+				VAR InclusionCheck = SELECTEDMEASURENAME() IN VALUES('Calculation Group Inclusion'[DateAggregation]) && 
+				                     SELECTEDMEASURENAME() IN VALUES('Aggregation Type Inclusion'[Average])
+				
+				VAR Categories =
+				    SUMMARIZE(
+				        'F_Sales',
+				        'D_Date'[Date],
+				        "MeasureValue", SELECTEDMEASURE(),
+				        "Weight", SUM('F_Sales'[sales])
+				    )
+				
+				VAR WeightedEvaluation =
+				    DIVIDE(
+				        SUMX(Categories, [MeasureValue] * [Weight]),
+				        SUMX(Categories, [Weight])
+				    )
+				
+				RETURN
+				    IF(
+				        InclusionCheck,
+				        WeightedEvaluation,
+				        SELECTEDMEASURE()
+				    )
+				```
+
+		calculationItem 'Median By Date' = ```
+				
+				VAR Categories =
+				    VALUES ( 'F_Sales'[Hour] )
+				
+				VAR CalcByCategory =
+				    ADDCOLUMNS (
+				        Categories,
+				        "MeasureValue", CALCULATE ( SELECTEDMEASURE () )
+				    )
+				
+				VAR CalcByCategory_NoBlanks =
+				    FILTER ( CalcByCategory, NOT ISBLANK ( [MeasureValue] ) )
+				
+				VAR InclusionCheck =
+				    SELECTEDMEASURENAME () IN VALUES ( 'Calculation Group Inclusion'[DateAggregation] ) &&
+				    SELECTEDMEASURENAME () IN VALUES ( 'Aggregation Type Inclusion'[Median] )
+				
+				VAR MeasureEvaluation =
+				    IF (
+				        InclusionCheck,
+				        MEDIANX ( CalcByCategory_NoBlanks, [MeasureValue] ),
+				        SELECTEDMEASURE ()
+				    )
+				
+				RETURN
+				    MeasureEvaluation
+				
+				```
+
+		calculationItem 'Weighted Median By Date' = ```
+				
+				
+				VAR InclusionCheck = SELECTEDMEASURENAME() IN VALUES('Calculation Group Inclusion'[DateAggregation]) && 
+				                     SELECTEDMEASURENAME() IN VALUES('Aggregation Type Inclusion'[Median])
+				
+				Var Categories =
+				    ADDCOLUMNS(
+				        SUMMARIZE(
+				            'F_Sales',
+				            'D_Date'[Date],
+				            "MeasureValue", SELECTEDMEASURE(),
+				            "Weight", SUM('F_Sales'[sales])
+				        ),
+				        "InnerSort", [MeasureValue]
+				    )
+				
+				VAR TotalWeight =
+				    SUMX(Categories, [Weight])
+				
+				VAR HalfWeight =
+				    TotalWeight / 2
+				
+				Var WeightedTable =
+				    ADDCOLUMNS(
+				        Categories,
+				        "CumulativeWeight",
+				            VAR CurrentValue = [InnerSort]
+				            RETURN
+				                SUMX(
+				                    FILTER(Categories, [InnerSort] <= CurrentValue),
+				                    [Weight]
+				                )
+				    )
+				
+				VAR WeightedEvaluation =
+				    MINX(
+				        FILTER(WeightedTable, [CumulativeWeight] >= HalfWeight),
+				        [InnerSort]
+				    )
+				
+				RETURN
+				    IF(
+				        InclusionCheck,
+				        WeightedEvaluation,
+				        SELECTEDMEASURE()
+				    )
+				```
+
+		calculationItem 'Max By Date' = ```
+				
+				Var Dates =
+				    VALUES('F_Sales'[Date])
+				
+				Var CalcByDate =
+				    ADDCOLUMNS(
+				        Dates,
+				        "MeasureValue", CALCULATE(SELECTEDMEASURE())
+				    )
+				
+				VAR InclusionCheck = SELECTEDMEASURENAME() IN VALUES('Calculation Group Inclusion'[DateAggregation]) && 
+				                     SELECTEDMEASURENAME() IN VALUES('Aggregation Type Inclusion'[Max])
+				
+				VAR MeasureEvaluation =
+				    IF(
+				        InclusionCheck,
+				        MAXX(CalcByDate, [MeasureValue]),
+				        SELECTEDMEASURE()
+				    )
+				    
+				RETURN
+				    MeasureEvaluation
+				```
+
+		calculationItem 'Min By Date' = ```
+				
+				Var Dates =
+				    VALUES('F_Sales'[Date])
+				
+				Var CalcByDate =
+				    ADDCOLUMNS(
+				        Dates,
+				        "MeasureValue", CALCULATE(SELECTEDMEASURE())
+				    )
+				
+				VAR InclusionCheck = SELECTEDMEASURENAME() IN VALUES('Calculation Group Inclusion'[DateAggregation]) && 
+				                     SELECTEDMEASURENAME() IN VALUES('Aggregation Type Inclusion'[Min])
+				
+				VAR MeasureEvaluation =
+				    IF(
+				        InclusionCheck,
+				        MINX(CalcByDate, [MeasureValue]),
+				        SELECTEDMEASURE()
+				    )
+				    
+				RETURN
+				    MeasureEvaluation
+				```
+
+		calculationItem 'Sdev By Date' = ```
+				
+				Var Dates =
+				    VALUES('F_Sales'[Date])
+				
+				Var CalcByDate =
+				    ADDCOLUMNS(
+				        Dates,
+				        "MeasureValue", CALCULATE(SELECTEDMEASURE())
+				    )
+				
+				VAR InclusionCheck = SELECTEDMEASURENAME() IN VALUES('Calculation Group Inclusion'[DateAggregation]) && 
+				                     SELECTEDMEASURENAME() IN VALUES('Aggregation Type Inclusion'[Sdev])
+				
+				VAR MeasureEvaluation =
+				    IF(
+				        InclusionCheck,
+				        STDEVX.P(CalcByDate, [MeasureValue]),
+				        SELECTEDMEASURE()
+				    )
+				    
+				RETURN
+				    MeasureEvaluation
+				```
+
+		calculationItem 'Weighted Sdev By Date' = ```
+				
+				VAR InclusionCheck = SELECTEDMEASURENAME() IN VALUES('Calculation Group Inclusion'[DateAggregation]) && 
+				                     SELECTEDMEASURENAME() IN VALUES('Aggregation Type Inclusion'[Sdev])
+				
+				Var Categories =
+				    ADDCOLUMNS(
+				        SUMMARIZE(
+				            'F_Sales',
+				            'D_Date'[Date],
+				            "MeasureValue", SELECTEDMEASURE(),
+				            "Weight", SUM('F_Sales'[sales])
+				        ),
+				        "InnerSort", [MeasureValue]
+				    )
+				
+				VAR TotalWeight =
+				    SUMX(Categories, [Weight])
+				
+				VAR WeightedMean =
+				    DIVIDE(
+				        SUMX(Categories, [Weight] * [MeasureValue]),
+				        TotalWeight
+				    )
+				
+				VAR WeightedEvaluation =
+				    SQRT(
+				        DIVIDE(
+				            SUMX(
+				                Categories,
+				                [Weight] * POWER([MeasureValue] - WeightedMean, 2)
+				            ),
+				            TotalWeight
+				        )
+				    )
+				
+				RETURN
+				    IF(
+				        InclusionCheck,
+				        WeightedEvaluation,
+				        SELECTEDMEASURE()
+				    )
+				```
+
+	column 'Date Aggregation'
+		dataType: string
+		lineageTag: 0e6d1769-edf9-43a0-a873-633cb0747511
+		summarizeBy: none
+		sourceColumn: Name
+		sortByColumn: Ordinal
+
+		annotation SummarizationSetBy = Automatic
+
+	column Ordinal
+		dataType: int64
+		formatString: 0
+		lineageTag: 5d153106-b6f7-47e5-8808-483aec153b61
+		summarizeBy: sum
+		sourceColumn: Ordinal
+
+		annotation SummarizationSetBy = Automatic
+

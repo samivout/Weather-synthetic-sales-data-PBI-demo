@@ -1,0 +1,80 @@
+table D_Salesperson
+	lineageTag: 7dc0127b-58f8-4ea4-88b9-4f1dbff53db2
+
+	column person_id
+		dataType: int64
+		formatString: 0
+		lineageTag: 49f5f18d-6181-4c48-9bc1-bb9b2899e06f
+		summarizeBy: none
+		sourceColumn: person_id
+
+		annotation SummarizationSetBy = Automatic
+
+	column Name
+		dataType: string
+		lineageTag: 8973bb0d-1751-4bed-8342-3b995e61b969
+		summarizeBy: none
+		sourceColumn: Name
+
+		annotation SummarizationSetBy = Automatic
+
+	column location_id
+		dataType: int64
+		formatString: 0
+		lineageTag: a6250715-9824-4d33-b9be-02603a8791f8
+		summarizeBy: none
+		sourceColumn: location_id
+
+		annotation SummarizationSetBy = Automatic
+
+	column age
+		dataType: int64
+		formatString: 0
+		lineageTag: 0e640cbe-9654-4263-bded-d1326d24f359
+		summarizeBy: none
+		sourceColumn: age
+
+		annotation SummarizationSetBy = Automatic
+
+	column email
+		dataType: string
+		lineageTag: 76453bd7-9ac4-4c5c-9529-b2ac57649fa7
+		summarizeBy: none
+		sourceColumn: email
+
+		annotation SummarizationSetBy = Automatic
+
+	column working_hours_start
+		dataType: int64
+		formatString: 0
+		lineageTag: e4ebc9c2-be1f-44e1-a66f-0a60018cf5f0
+		summarizeBy: none
+		sourceColumn: working_hours_start
+
+		annotation SummarizationSetBy = Automatic
+
+	column working_hours_end
+		dataType: int64
+		formatString: 0
+		lineageTag: b6239989-0b0b-4880-a5ac-6cfcd5d166f4
+		summarizeBy: none
+		sourceColumn: working_hours_end
+
+		annotation SummarizationSetBy = Automatic
+
+	partition D_Salesperson = m
+		mode: import
+		source =
+				let
+				    Source = Parquet.Document(File.Contents("file:///C:/dev/data/delta/test_salesperson_data_latest.parquet"), [Compression=null, LegacyColumnNameEncoding=false, MaxDepth=null]),
+				    #"Removed Columns" = Table.RemoveColumns(Source,{"performance_weight"}),
+				    #"Renamed Columns" = Table.RenameColumns(#"Removed Columns",{{"person_name", "Name"}})
+				in
+				    #"Renamed Columns"
+
+	changedProperty = Name
+
+	annotation PBI_NavigationStepName = Navigation
+
+	annotation PBI_ResultType = Table
+

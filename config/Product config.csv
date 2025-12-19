@@ -1,0 +1,21 @@
+product_id;product_name;product_price;category_id
+1;Vanilla Ice Cream;2.50;1
+2;Chocolate Ice Cream;2.80;1
+3;Strawberry Ice Cream;2.70;1
+4;Pistachio Ice Cream;3.20;1
+5;Caramel Ice Cream;3.00;1
+6;Mint Chocolate Ice Cream;3.50;1
+7;Licorice Ice Cream;3.10;1
+8;Lemon Ice Cream;2.60;1
+9;Caramelized Ice Cream;3.40;1
+10;Blueberry Ice Cream;2.90;1
+11;Raspberry Sorbet;3.90;2
+12;Mango Sorbet;4.10;2
+13;Lemon Sorbet;3.80;2
+14;Blackcurrant Sorbet;4.20;2
+15;Passion Fruit Sorbet;4.00;2
+16;Vanilla Soft Serve;3.20;3
+17;Chocolate Soft Serve;3.40;3
+18;Strawberry Soft Serve;3.30;3
+19;Caramel Soft Serve;3.50;3
+20;Mint Soft Serve;3.60;3

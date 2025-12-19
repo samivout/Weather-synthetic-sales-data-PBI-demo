@@ -1,0 +1,141 @@
+table F_Sales
+	lineageTag: fd074f52-d9dd-45af-b800-c1ab57654087
+
+	column location_id
+		dataType: int64
+		formatString: 0
+		lineageTag: 84981454-82fc-4cb9-bc5f-95e5f83de930
+		summarizeBy: none
+		sourceColumn: location_id
+
+		annotation SummarizationSetBy = Automatic
+
+	column person_id
+		dataType: int64
+		formatString: 0
+		lineageTag: 77480a84-dac9-44af-9fda-df36ecd21ac5
+		summarizeBy: none
+		sourceColumn: person_id
+
+		annotation SummarizationSetBy = Automatic
+
+	column product_id
+		dataType: int64
+		formatString: 0
+		lineageTag: 6bf066f8-1866-488e-99c7-c7a1700c8010
+		summarizeBy: none
+		sourceColumn: product_id
+
+		annotation SummarizationSetBy = Automatic
+
+	column sales
+		dataType: int64
+		formatString: 0
+		lineageTag: 17294cf3-d160-48b1-aded-f4aaf480c801
+		summarizeBy: sum
+		sourceColumn: sales
+
+		annotation SummarizationSetBy = Automatic
+
+	column Date
+		dataType: dateTime
+		formatString: Short Date
+		lineageTag: 00323349-735b-4354-9a07-6426d4e4247f
+		summarizeBy: none
+		sourceColumn: Date
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation UnderlyingDateTimeDataType = Date
+
+	column Hour
+		dataType: int64
+		formatString: 0
+		lineageTag: 1435fe99-788f-4d36-8b11-1c7a8ced0ca8
+		summarizeBy: none
+		sourceColumn: Hour
+
+		annotation SummarizationSetBy = Automatic
+
+	column Temperature
+		dataType: double
+		lineageTag: 81b26b6d-f57f-4067-aaae-3172c465f3df
+		summarizeBy: sum
+		sourceColumn: Temperature
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column 'Rain amount'
+		dataType: double
+		lineageTag: 157edba4-dece-4834-8f4b-818a4c650cc5
+		summarizeBy: sum
+		sourceColumn: Rain amount
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column weather_index
+		dataType: double
+		lineageTag: fe8593ce-8144-4cfd-a519-575f623322ce
+		summarizeBy: sum
+		sourceColumn: weather_index
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	column BinID = ```
+			
+			CALCULATE(
+			    MIN('D_Weather_Index_Bins'[BinID]),
+			    FILTER('D_Weather_Index_Bins', 'F_Sales'[weather_index] >= 'D_Weather_Index_Bins'[BinStart] && 'F_Sales'[weather_index] <= 'D_Weather_Index_Bins'[BinEnd])
+			)
+			
+			```
+		formatString: 0
+		lineageTag: e776aad2-bf10-481a-891f-f3c92108ce8d
+		summarizeBy: none
+
+		annotation SummarizationSetBy = Automatic
+
+	column Index =
+			
+			RANKX(
+			    ALL('F_Sales'),
+			    'F_Sales'[Date] * 1000000
+			        + 'F_Sales'[Hour] * 1000
+			        + 'F_Sales'[person_id] * 100
+			        + 'F_Sales'[product_id] * 10
+			        + 'F_Sales'[location_id],
+			    ,
+			    ASC,
+			    DENSE
+			)
+		formatString: 0
+		lineageTag: f5d1d7e6-2e73-467e-acc3-893b9e5a1066
+		summarizeBy: sum
+
+		annotation SummarizationSetBy = Automatic
+
+	partition F_Sales = m
+		mode: import
+		source =
+				let
+				    Source = Parquet.Document(File.Contents("file:///C:/dev/data/delta/test_sales_data_latest.parquet"), [Compression=null, LegacyColumnNameEncoding=false, MaxDepth=null]),
+				    #"Inserted Date" = Table.AddColumn(Source, "Date", each Date.From([timestamp]), type date),
+				    #"Inserted Hour" = Table.AddColumn(#"Inserted Date", "Hour", each Time.Hour([timestamp]), Int64.Type),
+				    #"Removed Columns" = Table.RemoveColumns(#"Inserted Hour",{"timestamp"}),
+				    #"Merged Queries" = Table.NestedJoin(#"Removed Columns", {"Date", "location_id", "Hour"}, weather_data, {"Date", "location_id", "Hour"}, "weather_data", JoinKind.LeftOuter),
+				    #"Expanded weather_data" = Table.ExpandTableColumn(#"Merged Queries", "weather_data", {"Temperature", "Rain amount", "weather_index"}, {"Temperature", "Rain amount", "weather_index"})
+				in
+				    #"Expanded weather_data"
+
+	changedProperty = Name
+
+	annotation PBI_ResultType = Table
+
+	annotation PBI_NavigationStepName = Navigation
+

@@ -1,0 +1,1429 @@
+table Main_Measures
+	lineageTag: 4b4752bf-ce4b-4665-8e1f-685795b5da5c
+
+	measure 'Sales Max' =
+			
+			MAX('F_Sales'[sales])
+		displayFolder: Atomic Sales Measures
+		lineageTag: 502bb0c0-6a48-4442-8277-f70eb60b2729
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure 'Sales Mean' =
+			
+			AVERAGE('F_Sales'[sales])
+		displayFolder: Atomic Sales Measures
+		lineageTag: b2ede8c5-2c49-4318-b70b-49332588a7c3
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure 'Sales Median' =
+			
+			MEDIAN('F_Sales'[sales])
+		displayFolder: Atomic Sales Measures
+		lineageTag: d131e171-22a1-4761-8a17-4c6ca1c8cca9
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure 'Sales Min' =
+			
+			MIN('F_Sales'[sales])
+		displayFolder: Atomic Sales Measures
+		lineageTag: 914af9f8-005a-4e15-ae0f-22389c97879e
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure 'Sales Sdev' =
+			
+			STDEV.P('F_Sales'[sales])
+		displayFolder: Atomic Sales Measures
+		lineageTag: c0ca6085-4ff6-4110-b1e3-ca65a3efcb00
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure 'Sales Sum' =
+			
+			SUM('F_Sales'[sales])
+		displayFolder: Atomic Sales Measures
+		lineageTag: c1c8bb38-9465-4e49-8084-60ab42a049fe
+
+		formatStringDefinition = ""
+
+	measure 'Sales Max Adjusted' =
+			
+			MAXX(
+			    'F_Sales',
+			    DIVIDE('F_Sales'[sales], 'F_Sales'[weather_index])
+			)
+		displayFolder: Atomic Sales Measures Adjusted
+		lineageTag: 8e53ab2c-a326-4fa9-a2e4-02e68b377a03
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure 'Sales Mean Adjusted' =
+			
+			AVERAGEX(
+			    'F_Sales',
+			    DIVIDE('F_Sales'[sales], 'F_Sales'[weather_index])
+			)
+		displayFolder: Atomic Sales Measures Adjusted
+		lineageTag: 50dbbf1a-4d0f-41fa-88b1-8e6ea7fe865f
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure 'Sales Median Adjusted' =
+			
+			MEDIANX(
+			    'F_Sales',
+			    DIVIDE('F_Sales'[sales], 'F_Sales'[weather_index])
+			)
+		displayFolder: Atomic Sales Measures Adjusted
+		lineageTag: c74593b3-45f1-47e0-b5ef-de7dc2f89121
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure 'Sales Min Adjusted' =
+			
+			MINX(
+			    'F_Sales',
+			    DIVIDE('F_Sales'[sales], 'F_Sales'[weather_index])
+			)
+		displayFolder: Atomic Sales Measures Adjusted
+		lineageTag: 56f9292d-b906-40b1-818c-545609a21013
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure 'Sales Sdev Adjusted' =
+			
+			STDEVX.P(
+			    'F_Sales',
+			    DIVIDE('F_Sales'[sales], 'F_Sales'[weather_index])
+			)
+		displayFolder: Atomic Sales Measures Adjusted
+		lineageTag: 296b0c9a-2828-481a-9fa7-55a4c825a201
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure 'Sales Sum Adjusted' =
+			
+			SUMX(
+			    'F_Sales',
+			    DIVIDE('F_Sales'[sales], 'F_Sales'[weather_index])
+			)
+		displayFolder: Atomic Sales Measures Adjusted
+		lineageTag: 0a0fd131-c252-470c-82e2-f65de43c0978
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure 'Sales Agg - Peak Hour Deviation Correlation' =
+			
+			VAR __TABLE =
+			    FILTER(
+			        SUMMARIZECOLUMNS(
+			            'F_Sales'[Date],
+			            'F_Sales'[Hour],
+			            "__X", [Sales Aggregation],
+			            "__Y", [Distance From Peak Hour]
+			        ),
+			        NOT ( ISBLANK([__X]) || ISBLANK([__Y]) )
+			    )
+			
+			VAR __COUNT   = COUNTROWS(__TABLE)
+			VAR __SUM_X   = SUMX(__TABLE, [__X])
+			VAR __SUM_Y   = SUMX(__TABLE, [__Y])
+			VAR __SUM_XY  = SUMX(__TABLE, [__X] * [__Y])
+			VAR __SUM_X2  = SUMX(__TABLE, [__X] * [__X])
+			VAR __SUM_Y2  = SUMX(__TABLE, [__Y] * [__Y])
+			
+			RETURN
+			IF(
+			    __COUNT < 2,
+			    BLANK(),
+			    DIVIDE(
+			        __COUNT * __SUM_XY - __SUM_X * __SUM_Y,
+			        SQRT(
+			            (__COUNT * __SUM_X2 - __SUM_X * __SUM_X) *
+			            (__COUNT * __SUM_Y2 - __SUM_Y * __SUM_Y)
+			        )
+			    )
+			)
+		displayFolder: Sales-Hour Correlation
+		lineageTag: 77806ec8-a8c6-43a4-8e77-8e4317c048f5
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure 'Sales Agg - Peak Hour Deviation Correlation Datewise Average' = ```
+			
+			VAR __TABLE =
+			    SUMMARIZECOLUMNS(
+			        'D_Date'[Date],
+			        "Location correlation", CALCULATE([Sales Agg - Peak Hour Deviation Correlation])
+			    )
+			
+			RETURN
+			    AVERAGEX(
+			        __TABLE,
+			        [Location correlation]
+			    )
+			
+			
+			```
+		displayFolder: Sales-Hour Correlation
+		lineageTag: 3a520075-0cb4-4996-a859-da40b86ac242
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure 'Sales Agg - Peak Hour Deviation Correlation Locationwise Average' = ```
+			
+			VAR __TABLE =
+			    SUMMARIZECOLUMNS(
+			        'D_Location'[location_id],
+			        "Location correlation",
+			        CALCULATE(
+			            [Sales Agg - Peak Hour Deviation Correlation]
+			        )
+			    )
+			
+			RETURN
+			    AVERAGEX(
+			        __TABLE,
+			        [Location correlation]
+			    )
+			
+			
+			```
+		displayFolder: Sales-Hour Correlation
+		lineageTag: 7a5c6875-82b7-4869-8537-7048e4b54835
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure 'Sales Agg - Peak Hour Deviation Correlation Locationwise Sdev' = ```
+			
+			VAR __TABLE =
+			    SUMMARIZECOLUMNS(
+			        'D_Location'[location_id],
+			        "Location correlation",
+			        CALCULATE(
+			            [Sales Agg - Peak Hour Deviation Correlation]
+			        )
+			    )
+			
+			RETURN
+			    STDEVX.P(
+			        __TABLE,
+			        [Location correlation]
+			    )
+			
+			
+			```
+		displayFolder: Sales-Hour Correlation
+		lineageTag: 078a0555-0805-4d12-91d3-4c088248595d
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure 'Sales Agg - Sales Hour Correlation' =
+			
+			VAR __TABLE =
+			    FILTER(
+			        SUMMARIZECOLUMNS(
+			            'F_Sales'[Date],
+			            'F_Sales'[Hour],
+			            "__X", [Sales Aggregation],
+			            "__Y", AVERAGE('F_Sales'[Hour])
+			        ),
+			        NOT ( ISBLANK([__X]) || ISBLANK([__Y]) )
+			    )
+			
+			VAR __COUNT   = COUNTROWS(__TABLE)
+			VAR __SUM_X   = SUMX(__TABLE, [__X])
+			VAR __SUM_Y   = SUMX(__TABLE, [__Y])
+			VAR __SUM_XY  = SUMX(__TABLE, [__X] * [__Y])
+			VAR __SUM_X2  = SUMX(__TABLE, [__X] ^ 2)
+			VAR __SUM_Y2  = SUMX(__TABLE, [__Y] ^ 2)
+			
+			RETURN
+			IF(
+			    __COUNT < 2,
+			    BLANK(),
+			    DIVIDE(
+			        __COUNT * __SUM_XY - __SUM_X * __SUM_Y,
+			        SQRT(
+			            (__COUNT * __SUM_X2 - __SUM_X ^ 2) *
+			            (__COUNT * __SUM_Y2 - __SUM_Y ^ 2)
+			        )
+			    )
+			)
+		displayFolder: Sales-Hour Correlation
+		lineageTag: 2576f904-b4d0-4d4b-9ec7-9eea43e5ffd6
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure 'Sales Agg - Sales Hour Correlation Datewise Average' = ```
+			
+			VAR __TABLE =
+			    SUMMARIZECOLUMNS(
+			        'D_Date'[Date],
+			        "Location correlation", CALCULATE([Sales Agg - Sales Hour Correlation])
+			    )
+			
+			RETURN
+			    AVERAGEX(
+			        __TABLE,
+			        [Location correlation]
+			    )
+			
+			
+			```
+		displayFolder: Sales-Hour Correlation
+		lineageTag: 325a664f-b8f4-4598-9141-cf25343451ed
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure 'Sales Agg - Sales Hour Correlation Locationwise Average' = ```
+			
+			VAR __TABLE =
+			    SUMMARIZECOLUMNS(
+			        'D_Location'[location_id],
+			        "Location correlation", CALCULATE([Sales Agg - Sales Hour Correlation])
+			    )
+			
+			RETURN
+			    AVERAGEX(
+			        __TABLE,
+			        [Location correlation]
+			    )
+			
+			
+			```
+		displayFolder: Sales-Hour Correlation
+		lineageTag: e0f43e56-131a-49ff-924a-0498b980cedf
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure 'Sales Agg - Sales Hour Correlation Locationwise Sdev' = ```
+			
+			VAR __TABLE =
+			    SUMMARIZECOLUMNS(
+			        'D_Location'[location_id],
+			        "Location correlation", CALCULATE([Sales Agg - Sales Hour Correlation])
+			    )
+			
+			RETURN
+			    STDEVX.P(
+			        __TABLE,
+			        [Location correlation]
+			    )
+			
+			
+			```
+		displayFolder: Sales-Hour Correlation
+		lineageTag: 3fc63d0f-cf82-4f08-8dd4-e3606d53d2ef
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure 'Sales Agg - Average Weather Index Correlation' =
+			
+			VAR __TABLE =
+			    FILTER(
+			        SUMMARIZECOLUMNS(
+			            'F_Sales'[Date],
+			            'F_Sales'[Hour],
+			            "__X", [Sales Aggregation],
+			            "__Y", [Weather Index Average]
+			        ),
+			        NOT ( ISBLANK([__X]) || ISBLANK([__Y]) )
+			    )
+			
+			VAR __COUNT = COUNTROWS(__TABLE)
+			VAR __SUM_X   = SUMX(__TABLE, [__X])
+			VAR __SUM_Y   = SUMX(__TABLE, [__Y])
+			VAR __SUM_XY  = SUMX(__TABLE, [__X] * [__Y])
+			VAR __SUM_X2  = SUMX(__TABLE, [__X] ^ 2)
+			VAR __SUM_Y2  = SUMX(__TABLE, [__Y] ^ 2)
+			
+			RETURN
+			IF(
+			    __COUNT < 2,
+			    BLANK(),
+			    DIVIDE(
+			        __COUNT * __SUM_XY - __SUM_X * __SUM_Y,
+			        SQRT(
+			            (__COUNT * __SUM_X2 - __SUM_X ^ 2) *
+			            (__COUNT * __SUM_Y2 - __SUM_Y ^ 2)
+			        )
+			    )
+			)
+		displayFolder: Sales-Weather Correlation
+		lineageTag: 57082e6c-ef5d-4a21-9ffb-6eae1c18233a
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure 'Sales Agg - Average Weather Index Correlation Hourwise Average' = ```
+			
+			VAR __TABLE =
+			    SUMMARIZECOLUMNS(
+			        'D_Time'[Hour],
+			        "Location correlation", CALCULATE([Sales Agg - Average Weather Index Correlation])
+			    )
+			
+			RETURN
+			    AVERAGEX(
+			        __TABLE,
+			        [Location correlation]
+			    )
+			
+			
+			```
+		displayFolder: Sales-Weather Correlation
+		lineageTag: d72ae847-839f-4575-b791-d7fa258aa863
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure 'Sales Agg - Average Weather Index Correlation Locationwise Average' = ```
+			
+			VAR __TABLE =
+			    SUMMARIZECOLUMNS(
+			        'D_Location'[location_id],
+			        "Location correlation", CALCULATE([Sales Agg - Average Weather Index Correlation])
+			    )
+			
+			RETURN
+			    AVERAGEX(
+			        __TABLE,
+			        [Location correlation]
+			    )
+			
+			
+			```
+		displayFolder: Sales-Weather Correlation
+		lineageTag: a2020784-6baf-4d6a-9ed0-62129e1fd4c9
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure 'Sales Agg - Average Weather Index Correlation Locationwise Sdev' = ```
+			
+			VAR __TABLE =
+			    SUMMARIZECOLUMNS(
+			        'D_Location'[location_id],
+			        "Location correlation", CALCULATE([Sales Agg - Average Weather Index Correlation])
+			    )
+			
+			RETURN
+			    STDEVX.P(
+			        __TABLE,
+			        [Location correlation]
+			    )
+			
+			
+			```
+		displayFolder: Sales-Weather Correlation
+		lineageTag: f0be35c9-cb1a-403a-a457-5bd7310c5322
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure 'Weather Index Average' =
+			
+			CALCULATE(
+			    AVERAGE('F_Sales'[weather_index]),
+			    'RemoveWeatherDuplicates'[Calculation group column] = "CollapseWeatherDuplicates"
+			)
+		formatString: 0.00
+		displayFolder: Atomic Weather Index Measures
+		lineageTag: a335ea19-1149-4921-8060-6d4fe43f389b
+
+	measure 'Location-averaged Sales Aggregation' = ```
+			
+			VAR __TABLE =
+			    SUMMARIZECOLUMNS(
+			        'D_Location'[location_id],
+			        "Location correlation", CALCULATE([Sales Aggregation])
+			    )
+			
+			RETURN
+			    AVERAGEX(
+			        __TABLE,
+			        [Location correlation]
+			    )
+			
+			
+			```
+		displayFolder: Sales Aggregation
+		lineageTag: 617553ba-ec75-457b-ba65-318b411b5934
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure 'Location-Sdev of Average Weather Index' = ```
+			
+			VAR __TABLE =
+			    SUMMARIZECOLUMNS(
+			        'D_Location'[location_id],
+			        "Location correlation", CALCULATE([Weather Index Average])
+			    )
+			
+			RETURN
+			    STDEVX.P(
+			        __TABLE,
+			        [Location correlation]
+			    )
+			
+			
+			```
+		displayFolder: Weather Index Aggregations
+		lineageTag: a97b13bd-bb08-4c4c-8376-e7e066e88802
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure 'Location-averaged Average Weather Index' = ```
+			
+			VAR __TABLE =
+			    SUMMARIZECOLUMNS(
+			        'D_Location'[location_id],
+			        "Location correlation", CALCULATE([Weather Index Average])
+			    )
+			
+			RETURN
+			    AVERAGEX(
+			        __TABLE,
+			        [Location correlation]
+			    )
+			
+			
+			```
+		displayFolder: Weather Index Aggregations
+		lineageTag: 89b87495-8d75-403b-be67-a34424150ef8
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure 'Location-Sdev of Sales Aggregation' = ```
+			
+			VAR __TABLE =
+			    SUMMARIZECOLUMNS(
+			        'D_Location'[location_id],
+			        "Location correlation", CALCULATE([Sales Aggregation])
+			    )
+			
+			RETURN
+			    STDEVX.P(
+			        __TABLE,
+			        [Location correlation]
+			    )
+			
+			
+			```
+		displayFolder: Sales Aggregation
+		lineageTag: f683c257-48b2-4c01-ab91-3c803308e854
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure 'Product Global Rank' = ```
+			
+			VAR CurrentValue =
+			    [Sales Aggregation]
+			RETURN
+			    RANKX (
+			        ALL( 'D_Product'[Product], 'D_Product'[category_id]),
+			        [Sales Aggregation],
+			        CurrentValue,
+			        DESC,
+			        DENSE
+			    )
+			
+			```
+		displayFolder: Ranking
+		lineageTag: 0a167209-601e-4097-98b8-a6093ff6e62c
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure 'Sales Aggregation' = ```
+			
+			VAR _Choice =
+			    SELECTEDVALUE ( 'L_Atomic_Measure_Names'[Measure name], "Sales Sum" )  -- default
+			RETURN
+			    SWITCH (
+			        _Choice,
+			        "Sales Sum",    [Sales Sum],
+			        "Sales Mean",   [Sales Mean],
+			        "Sales Median", [Sales Median],
+			        "Sales Max",    [Sales Max],
+			        "Sales Min",    [Sales Min],
+			        "Sales Sdev",   [Sales Sdev],
+			        BLANK()  -- fallback if name not found
+			    )
+			
+			```
+		displayFolder: Sales Aggregation
+		lineageTag: 5c8b19b3-1ddd-4d13-b338-9b198e6e95af
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure 'Sales Aggregation Adjusted' = ```
+			
+			VAR _Choice =
+			    SELECTEDVALUE ( 'L_Atomic_Measure_Names'[Measure name], "Sales Sum" )  -- default
+			RETURN
+			    SWITCH (
+			        _Choice,
+			        "Sales Sum",    [Sales Sum Adjusted],
+			        "Sales Mean",   [Sales Mean Adjusted],
+			        "Sales Median", [Sales Median Adjusted],
+			        "Sales Max",    [Sales Max Adjusted],
+			        "Sales Min",    [Sales Min Adjusted],
+			        "Sales Sdev",   [Sales Sdev Adjusted],
+			        BLANK()  -- fallback if name not found
+			    )
+			
+			```
+		displayFolder: Sales Aggregation
+		lineageTag: 8c9f930e-952f-4e3c-b26a-b6c27742ee30
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure 'Sales Aggregation Current To Previous Year' =
+			
+			CALCULATE(
+			    [Sales Aggregation],
+			    'D_Date'[Year] = YEAR(NOW()) - 1
+			)
+		displayFolder: Sales Aggregation
+		lineageTag: 4a5efe2d-3eeb-4267-8e1f-3271d175c13e
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure 'Sales Aggregation Current Year' =
+			
+			CALCULATE(
+			    [Sales Aggregation],
+			    'D_Date'[Year] = YEAR(NOW())
+			)
+		displayFolder: Sales Aggregation
+		lineageTag: afe98344-8409-4a70-92b3-47a27faa88d9
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure 'Sales Aggregation Last Year' =
+			
+			
+			VAR IsSingleYearSelected = HASONEVALUE('D_Date'[Year])
+			
+			VAR LastYearEvaluation =
+			CALCULATE(
+			    [Sales Aggregation],
+			    SAMEPERIODLASTYEAR(
+			        'D_Date'[Date]
+			    )
+			)
+			
+			VAR NotBlank =
+			    NOT ISBLANK(LastYearEvaluation)
+			
+			RETURN
+			IF(
+			    IsSingleYearSelected && NotBlank,
+			    LastYearEvaluation,
+			    BLANK()
+			)
+		displayFolder: Sales Aggregation
+		lineageTag: 5ea5adb7-f861-4f61-b9f7-efaca648c13b
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure 'Sales Aggregation Yearly Average' = ```
+			
+			VAR __TABLE = 
+			    SUMMARIZECOLUMNS( 'D_Date'[Year], 
+			        "Evaluation", 
+			        CALCULATE([Sales Aggregation])
+			    ) 
+			    
+			RETURN
+			    AVERAGEX( __TABLE, [Evaluation] )
+			```
+		displayFolder: Sales Aggregation
+		lineageTag: 39d98faa-35b7-44e2-a6a1-8198a06cdea6
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure 'Hypothetical Sales Loss %' =
+			
+			DIVIDE(
+			    [Sales Aggregation] - [Sales Aggregation Adjusted],
+			    [Sales Aggregation]
+			)
+		formatString: 0.00\ %;-0.00\ %;0.00\ %
+		displayFolder: Sales Delta Measures
+		lineageTag: 240d1308-d74a-45b3-b312-e859ba1aecb9
+
+	measure 'Location Rank' = ```
+			
+			VAR CurrentValue =
+			    [Sales Aggregation]
+			RETURN
+			    RANKX (
+			        ALL ( 'D_Location'[Location] ),
+			        [Sales Aggregation],
+			        CurrentValue,
+			        DESC,
+			        DENSE
+			    )
+			
+			```
+		displayFolder: Ranking
+		lineageTag: b4749179-5839-4f4f-baa3-46bc4a6a2439
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure 'Hour of Sale Mean' =
+			
+			DIVIDE(
+			        SUMX(
+			            'F_Sales',
+			            'F_Sales'[Hour] * 'F_Sales'[sales]
+			        ),
+			        SUM('F_Sales'[sales])
+			)
+		lineageTag: 35290f66-2995-499b-93bd-957a4153afb2
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure 'Sales Aggregation Yearly Average Previous Years' = ```
+			
+			VAR SelectedYears =
+			    YEAR(NOW())
+			
+			VAR __TABLE =
+			    SUMMARIZECOLUMNS (
+			        'D_Date'[Year],
+			        FILTER (
+			            ALL ( 'D_Date'[Year] ),
+			            'D_Date'[Year] <> SelectedYears
+			        ),
+			        "Evaluation", CALCULATE ( [Sales Aggregation] )
+			    )
+			
+			RETURN
+			    AVERAGEX ( __TABLE, [Evaluation] )
+			
+			```
+		displayFolder: Sales Aggregation
+		lineageTag: bd0812a9-66fa-453e-86d3-318a97ff85d3
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure 'Sales Aggregation Yearly Average Unselected' = ```
+			
+			VAR SelectedYears =
+			    VALUES ( 'D_Date'[Year] )
+			
+			VAR __TABLE =
+			    SUMMARIZECOLUMNS (
+			        'D_Date'[Year],
+			        FILTER (
+			            ALL ( 'D_Date'[Year] ),
+			            NOT 'D_Date'[Year] IN SelectedYears
+			        ),
+			        "Evaluation", CALCULATE ( [Sales Aggregation] )
+			    )
+			
+			RETURN
+			    AVERAGEX ( __TABLE, [Evaluation] )
+			
+			```
+		displayFolder: Sales Aggregation
+		lineageTag: 42acd096-6605-4de4-a0ba-e4a140c172ad
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure 'Sales Aggregation YoY Change %' =
+			
+			DIVIDE(
+			    [Sales Aggregation] - [Sales Aggregation Last Year],
+			    [Sales Aggregation]
+			)
+		formatString: 0.00\ %;-0.00\ %;0.00\ %
+		displayFolder: Sales Aggregation
+		lineageTag: 85cb10a0-5f5a-4e7c-afc5-365e86d9ce30
+
+	measure 'Salesperson Global Rank' = ```
+			
+			VAR CurrentValue =
+			    [Sales Aggregation]
+			RETURN
+			    RANKX (
+			        ALL ( 'D_Salesperson'[Name] ),
+			        [Sales Aggregation],
+			        CurrentValue,
+			        DESC,
+			        DENSE
+			    )
+			
+			```
+		displayFolder: Ranking
+		lineageTag: 486cd9db-eced-4f82-ac3c-555ec9af3ad2
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure 'Salesperson Local Rank' = ```
+			
+			VAR CurrentValue =
+			    [Sales Aggregation]
+			
+			VAR CurrentSalesperson =
+			    SELECTEDVALUE('D_Salesperson'[person_id])
+			
+			VAR __TABLE =
+			    FILTER(
+			        ADDCOLUMNS(
+			            'D_Salesperson',
+			            "Location",
+			            LOOKUPVALUE(
+			                'D_Location'[Location],
+			                'D_Location'[location_id],
+			                'D_Salesperson'[location_id]
+			            )
+			        ),
+			        'D_Salesperson'[person_id] = CurrentSalesperson
+			    )
+			
+			VAR CurrentLocale =
+			    MAXX(
+			        __TABLE,
+			        [location_id]
+			    )
+			
+			RETURN
+			    RANKX (
+			        FILTER(
+			            ALL ( 'D_Salesperson' ),
+			            'D_Salesperson'[location_id] = CurrentLocale
+			        ),
+			        [Sales Aggregation],
+			        CurrentValue,
+			        DESC,
+			        DENSE
+			    )
+			
+			```
+		displayFolder: Ranking
+		lineageTag: f6cbdcec-85c6-4d14-9b6e-b686d7ab8263
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure 'Total Revenue' =
+			
+			CALCULATE(
+			    SUMX(
+			        'F_Sales',
+			        'F_Sales'[sales] * RELATED('D_Product'[product_price])
+			    )
+			)
+		displayFolder: Revenue Measures
+		lineageTag: 17c8f786-21c6-459b-8fad-919be9b92a24
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure 'Sum Daily Aggregation Shifted Skip Blanks' = ```
+			
+			VAR IsDay     = ISINSCOPE('D_Date'[Date]) || ISINSCOPE('D_Date'[Day of Month])
+			VAR IsWeek    = ISINSCOPE('D_Date'[WeekOfYear])
+			VAR IsMonth   = ISINSCOPE('D_Date'[MonthNo]) || ISINSCOPE('D_Date'[MonthShort]) || ISINSCOPE('D_Date'[MonthLong])
+			VAR IsQuarter = ISINSCOPE('D_Date'[QuarterNumber]) || ISINSCOPE('D_Date'[Quarter])
+			VAR IsYear    = ISINSCOPE('D_Date'[Year])
+			RETURN
+			SWITCH (
+			    TRUE(),
+			    IsDay,
+			        VAR CurDate = MAX('D_Date'[Date])
+			        VAR PrevNonBlankDate =
+			            CALCULATE (
+			                LASTNONBLANK ( 'D_Date'[Date], [Sum Daily Sales Aggregation] ),
+			                FILTER ( ALL('D_Date'[Date]),
+			                         'D_Date'[Date] < CurDate )
+			            )
+			        RETURN CALCULATE ( [Sum Daily Sales Aggregation], KEEPFILTERS('D_Date'[Date] = PrevNonBlankDate) ),
+			
+			    IsWeek,
+			        VAR CurKey = MAX('D_Date'[Year]) * 100 + MAX('D_Date'[WeekOfYear])
+			        VAR PriorWeeks =
+			            ADDCOLUMNS (
+			                SUMMARIZE ( ALL('D_Date'[Year], 'D_Date'[WeekOfYear]), 'D_Date'[Year], 'D_Date'[WeekOfYear] ),
+			                "Key", 'D_Date'[Year] * 100 + 'D_Date'[WeekOfYear],
+			                "Val",
+			                    CALCULATE (
+			                        [Sum Daily Sales Aggregation],
+			                        KEEPFILTERS('D_Date'[Year] = 'D_Date'[Year]),
+			                        KEEPFILTERS('D_Date'[WeekOfYear] = 'D_Date'[WeekOfYear])
+			                    )
+			            )
+			        VAR PrevRow =
+			            TOPN ( 1, FILTER ( PriorWeeks, [Key] < CurKey && NOT ISBLANK([Val]) ), [Key], DESC )
+			        RETURN MAXX ( PrevRow, [Val] ),
+			
+			    IsMonth,
+			        VAR CurKey = MAX('D_Date'[Year]) * 12 + MAX('D_Date'[MonthNo])
+			        VAR PriorMonths =
+			            ADDCOLUMNS (
+			                SUMMARIZE ( ALL('D_Date'[Year], 'D_Date'[MonthNo]), 'D_Date'[Year], 'D_Date'[MonthNo] ),
+			                "Key", 'D_Date'[Year] * 12 + 'D_Date'[MonthNo],
+			                "Val",
+			                    CALCULATE (
+			                        [Sum Daily Sales Aggregation],
+			                        KEEPFILTERS('D_Date'[Year] = 'D_Date'[Year]),
+			                        KEEPFILTERS('D_Date'[MonthNo] = 'D_Date'[MonthNo])
+			                    )
+			            )
+			        VAR PrevRow =
+			            TOPN ( 1, FILTER ( PriorMonths, [Key] < CurKey && NOT ISBLANK([Val]) ), [Key], DESC )
+			        RETURN MAXX ( PrevRow, [Val] ),
+			
+			    IsQuarter,
+			        VAR CurKey = MAX('D_Date'[Year]) * 4 + MAX('D_Date'[QuarterNumber])
+			        VAR PriorQuarters =
+			            ADDCOLUMNS (
+			                SUMMARIZE ( ALL('D_Date'[Year], 'D_Date'[QuarterNumber]), 'D_Date'[Year], 'D_Date'[QuarterNumber] ),
+			                "Key", 'D_Date'[Year] * 4 + 'D_Date'[QuarterNumber],
+			                "Val",
+			                    CALCULATE (
+			                        [Sum Daily Sales Aggregation],
+			                        KEEPFILTERS('D_Date'[Year] = 'D_Date'[Year]),
+			                        KEEPFILTERS('D_Date'[QuarterNumber] = 'D_Date'[QuarterNumber])
+			                    )
+			            )
+			        VAR PrevRow =
+			            TOPN ( 1, FILTER ( PriorQuarters, [Key] < CurKey && NOT ISBLANK([Val]) ), [Key], DESC )
+			        RETURN MAXX ( PrevRow, [Val] ),
+			
+			    IsYear,
+			        VAR CurYear = MAX('D_Date'[Year])
+			        VAR PrevYear =
+			            CALCULATE (
+			                LASTNONBLANK ( 'D_Date'[Year], [Sum Daily Sales Aggregation] ),
+			                FILTER ( ALL('D_Date'[Year]), 'D_Date'[Year] < CurYear )
+			            )
+			        RETURN
+			            CALCULATE (
+			                [Sum Daily Sales Aggregation],
+			                KEEPFILTERS('D_Date'[Year] = PrevYear)
+			            ),
+			
+			    BLANK()
+			)
+			
+			```
+		isHidden
+		displayFolder: WIP Measures
+		lineageTag: 6e5c3aa7-ab0a-40fb-8e20-4fd25b136d0c
+
+		changedProperty = IsHidden
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure 'Sum Daily Sales Aggregation' = ```
+			
+			VAR Summarization=
+			    SUMMARIZECOLUMNS(
+			        'D_Time'[Hour],
+			        "Summarization", [Sales Sum]
+			    )
+			
+			VAR _Choice =
+			    SELECTEDVALUE ( 'L_Atomic_Measure_Names'[Measure name], "Sales Sum" )
+			
+			RETURN
+			    CALCULATE(
+			        SWITCH (
+			                _Choice,
+			                "Sales Sum",    SUMX(Summarization, [Summarization]),
+			                "Sales Mean",   AVERAGEX(Summarization, [Summarization]),
+			                "Sales Median", MEDIANX(Summarization, [Summarization]),
+			                "Sales Max",    MAXX(Summarization, [Summarization]),
+			                "Sales Min",    MINX(Summarization, [Summarization]),
+			                "Sales Sdev",   STDEVX.P(Summarization, [Summarization]),
+			                BLANK()  -- fallback if name not found
+			            )
+			    )
+			
+			
+			```
+		isHidden
+		displayFolder: WIP Measures
+		lineageTag: e77a4d83-6d05-45dc-891a-25e46687f5ed
+
+		changedProperty = IsHidden
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure 'Sum Daily Sales Aggregation Is Not Blank' =
+			
+			IF(
+			    NOT ISBLANK([Sum Daily Sales Aggregation]),
+			    1,
+			    0
+			)
+		isHidden
+		displayFolder: WIP Measures
+		lineageTag: 9dcc3c62-3830-4df6-b1cb-5506d4b9a43f
+
+		changedProperty = IsHidden
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure 'Sum Daily Sales Change Over Period Absolute' = ```
+			
+			VAR _Choice = SELECTEDVALUE('L_Atomic_Measure_Names'[Measure name], "Sales Sum")
+			
+			VAR CurrentEvaluation =
+			    CALCULATE(
+			        [Sum Daily Sales Aggregation],
+			        KEEPFILTERS('L_Atomic_Measure_Names'[Measure name] = _Choice)
+			    )
+			
+			VAR ShiftedEvaluation =
+			    CALCULATE(
+			        [Sum Daily Aggregation Shifted Skip Blanks],
+			        KEEPFILTERS('L_Atomic_Measure_Names'[Measure name] = _Choice)
+			    )
+			
+			RETURN
+			CurrentEvaluation - ShiftedEvaluation
+			
+			```
+		displayFolder: Daily Sales Measures
+		lineageTag: 4e06217f-4f1d-4c15-bf79-0873e7a88811
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure 'Sum Daily Sales Change Over Period Relative' = ```
+			
+			VAR _Choice = SELECTEDVALUE('L_Atomic_Measure_Names'[Measure name], "Sales Sum")
+			
+			VAR CurrentEvaluation =
+			    CALCULATE(
+			        [Sum Daily Sales Aggregation],
+			        KEEPFILTERS('L_Atomic_Measure_Names'[Measure name] = _Choice)
+			    )
+			
+			VAR ShiftedEvaluation =
+			    CALCULATE(
+			        [Sum Daily Aggregation Shifted Skip Blanks],
+			        KEEPFILTERS('L_Atomic_Measure_Names'[Measure name] = _Choice)
+			    )
+			
+			RETURN
+			DIVIDE(CurrentEvaluation - ShiftedEvaluation, ShiftedEvaluation)
+			
+			```
+		formatString: 0.00\ %;-0.00\ %;0.00\ %
+		displayFolder: Daily Sales Measures
+		lineageTag: dd7be094-4e02-4cd1-98af-3b9df8b357dd
+
+	measure 'Sum Daily Sales Shifted' = ```
+			
+			
+			VAR CurrentPeriodStart =
+			    SWITCH (
+			        TRUE(),
+			        ISINSCOPE ( 'D_Date'[Date] ) || ISINSCOPE('D_Date'[Day of Month]),
+			            MIN ( 'D_Date'[Date] ),
+			
+			        ISINSCOPE ( 'D_Date'[WeekOfYear] ),
+			            MINX ( VALUES ( 'D_Date'[Date] ), 'D_Date'[Date] ),
+			
+			        ISINSCOPE ( 'D_Date'[MonthNo] ) || ISINSCOPE( 'D_Date'[MonthShort]) || ISINSCOPE( 'D_Date'[MonthLong] ),
+			            STARTOFMONTH( 'D_Date'[Date] ),
+			
+			        ISINSCOPE ( 'D_Date'[QuarterNumber] ) || ISINSCOPE ( 'D_Date'[Quarter] ),
+			            STARTOFQUARTER( 'D_Date'[Date] ),
+			
+			        ISINSCOPE ( 'D_Date'[Year] ),
+			            STARTOFYEAR( 'D_Date'[Date] )
+			    )
+			
+			VAR PreviousPeriodEnd =
+			    SWITCH (
+			        TRUE(),
+			        ISINSCOPE ( 'D_Date'[Date] ) || ISINSCOPE('D_Date'[Day of Month]),
+			            MIN ( 'D_Date'[Date] ) - 1,
+			
+			        ISINSCOPE ( 'D_Date'[WeekOfYear] ),
+			            MINX ( VALUES ( 'D_Date'[Date] ), 'D_Date'[Date] ) - 1,
+			
+			        ISINSCOPE ( 'D_Date'[MonthNo] ) || ISINSCOPE( 'D_Date'[MonthShort]) || ISINSCOPE( 'D_Date'[MonthLong] ),
+			            STARTOFMONTH( 'D_Date'[Date] ) - 1,
+			
+			        ISINSCOPE ( 'D_Date'[QuarterNumber] ) || ISINSCOPE ( 'D_Date'[Quarter] ),
+			            STARTOFQUARTER( 'D_Date'[Date] ) - 1,
+			
+			        ISINSCOPE ( 'D_Date'[Year] ),
+			            STARTOFYEAR( 'D_Date'[Date] ) - 1
+			    )
+			
+			VAR CurrentPeriodEnd =
+			    SWITCH (
+			        TRUE(),
+			        ISINSCOPE ( 'D_Date'[Date] ) || ISINSCOPE('D_Date'[Day of Month]),
+			            MAX ( 'D_Date'[Date] ),
+			
+			        ISINSCOPE ( 'D_Date'[WeekOfYear] ),
+			            MAXX ( VALUES ( 'D_Date'[Date] ), 'D_Date'[Date] ),
+			
+			        ISINSCOPE ( 'D_Date'[MonthNo] ) || ISINSCOPE( 'D_Date'[MonthShort]) || ISINSCOPE( 'D_Date'[MonthLong] ),
+			            ENDOFMONTH ( 'D_Date'[Date] ),
+			
+			        ISINSCOPE ( 'D_Date'[QuarterNumber] ) || ISINSCOPE ( 'D_Date'[Quarter] ),
+			            ENDOFQUARTER ( 'D_Date'[Date] ),
+			
+			        ISINSCOPE ( 'D_Date'[Year] ),
+			            ENDOFYEAR ( 'D_Date'[Date] )
+			    )
+			
+			VAR CurrentPeriod = 
+			    FILTER(
+			        ALL('D_Date'[Date]),
+			        'D_Date'[Date] >= CurrentPeriodStart &&
+			        'D_Date'[Date] <= CurrentPeriodEnd
+			    )
+			
+			RETURN
+			SWITCH (
+			    TRUE(),
+			
+			    /* ================= DAILY ================= */
+			    ISINSCOPE ( 'D_Date'[Date] ) || ISINSCOPE ( 'D_Date'[Day of Month] ),
+			    VAR PrevDate =
+			        CALCULATE (
+			            MAX ( 'D_Date'[Date] ),
+			            FILTER (
+			                ALL ( 'D_Date'[Date] ),
+			                'D_Date'[Date] < CurrentPeriodStart &&
+			                NOT ISBLANK ( [Sum Daily Sales Aggregation] )
+			            )
+			        )
+			    RETURN
+			        CALCULATE (
+			            [Sum Daily Sales Aggregation],
+			            'D_Date'[Date] = PrevDate
+			        ),
+			
+			    /* ================= WEEK ================= */
+			    ISINSCOPE ( 'D_Date'[WeekOfYear] ),
+			    VAR PrevDate =
+			        CALCULATE (
+			            MAX ( 'D_Date'[Date] ),
+			            FILTER (
+			                ALL ( 'D_Date'[Date] ),
+			                'D_Date'[Date] < CurrentPeriodStart &&
+			                NOT ISBLANK ( [Sum Daily Sales Aggregation] )
+			            ),
+			            REMOVEFILTERS (
+			                'D_Date'[MonthNo],
+			                'D_Date'[MonthShort],
+			                'D_Date'[MonthLong]
+			            )
+			        )
+			    RETURN
+			        CALCULATE (
+			            [Sum Daily Sales Aggregation],
+			            'D_Date'[WeekOfYear] = PrevDate
+			        ),
+			
+			    /* ================= MONTH ================= */
+			    ISINSCOPE ( 'D_Date'[MonthNo] )
+			        || ISINSCOPE ( 'D_Date'[MonthShort] )
+			        || ISINSCOPE ( 'D_Date'[MonthLong] ),
+			    VAR PrevDate =
+			        CALCULATE (
+			            MAX ( 'D_Date'[MonthNo] ),
+			            FILTER (
+			                ALL ( 'D_Date'[Date] ),
+			                'D_Date'[Date] < CurrentPeriodStart &&
+			                NOT ISBLANK ( [Sum Daily Sales Aggregation] )
+			            ),
+			            REMOVEFILTERS (
+			                'D_Date'[Quarter],
+			                'D_Date'[QuarterNumber]
+			            )
+			        )
+			    RETURN
+			        CALCULATE (
+			            [Sum Daily Sales Aggregation],
+			            'D_Date'[MonthNo] = PrevDate
+			        ),
+			
+			    /* ================= QUARTER ================= */
+			    ISINSCOPE ( 'D_Date'[QuarterNumber] )
+			        || ISINSCOPE ( 'D_Date'[Quarter] ),
+			    VAR PrevDate =
+			        CALCULATE (
+			            MAX ( 'D_Date'[QuarterNumber] ),
+			            FILTER (
+			                ALL ( 'D_Date'[Date] ),
+			                'D_Date'[Date] < CurrentPeriodStart &&
+			                NOT ISBLANK ( [Sum Daily Sales Aggregation] )
+			            ),
+			            REMOVEFILTERS ( 'D_Date'[Year] )
+			        )
+			    RETURN
+			        CALCULATE (
+			            [Sum Daily Sales Aggregation],
+			            'D_Date'[QuarterNumber] = PrevDate
+			        ),
+			
+			    /* ================= YEAR ================= */
+			    ISINSCOPE ( 'D_Date'[Year] ),
+			    VAR PrevDate =
+			        CALCULATE (
+			            MAX ( 'D_Date'[Year] ),
+			            FILTER (
+			                ALL ( 'D_Date'[Date] ),
+			                'D_Date'[Date] < CurrentPeriodStart &&
+			                NOT ISBLANK ( [Sum Daily Sales Aggregation] )
+			            )
+			        )
+			    RETURN
+			        CALCULATE (
+			            [Sum Daily Sales Aggregation],
+			            'D_Date'[Year] = PrevDate
+			        )
+			)
+			
+			```
+		isHidden
+		displayFolder: WIP Measures
+		lineageTag: 5a267024-a1f0-4d0a-826d-92cbaf2c8183
+
+		changedProperty = IsHidden
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure 'Sum Daily Sales Shifted 2' =
+			
+			
+			VAR SelectedDay = SELECTEDVALUE('D_Date'[Date])
+			VAR SelectedWeek = SELECTEDVALUE('D_Date'[WeekOfYear])
+			VAR SelectedMonth = SELECTEDVALUE('D_Date'[MonthNo])
+			VAR SelectedQuarter = SELECTEDVALUE('D_Date'[QuarterNumber])
+			VAR SelectedYear = SELECTEDVALUE('D_Date'[Year])
+			
+			VAR PrevDay =
+			    CALCULATE(
+			        MAX('D_Date'[Date]),
+			        FILTER(
+			            ALL('D_Date'),
+			            'D_Date'[Date] < SelectedDay &&
+			            NOT ISBLANK([Sum Daily Sales Aggregation])
+			        )
+			    )
+			
+			VAR CurrentWeekStart =
+			    MINX(
+			        FILTER(
+			            'D_Date',
+			            'D_Date'[Year] = SelectedYear &&
+			            'D_Date'[WeekOfYear] = SelectedWeek
+			        ),
+			        'D_Date'[Date]
+			    )
+			
+			VAR CurrentWeekEnd =
+			    MAXX(
+			        FILTER(
+			            'D_Date',
+			            'D_Date'[Year] = SelectedYear &&
+			            'D_Date'[WeekOfYear] = SelectedWeek
+			        ),
+			        'D_Date'[Date]
+			    )
+			
+			VAR PrevWeekEnd =
+			    CALCULATE(
+			        MAX('D_Date'[Date]),
+			        FILTER(
+			            ALL('D_Date'),
+			            'D_Date'[Date] < CurrentWeekStart &&
+			            NOT ISBLANK([Sum Daily Sales Aggregation])
+			        )
+			    )
+			
+			RETURN
+			SWITCH (
+			    TRUE(),
+			
+			    /* ================= DAILY ================= */
+			    ISINSCOPE ( 'D_Date'[Date] ) || ISINSCOPE ( 'D_Date'[Day of Month] ),
+			    CALCULATE(
+			        [Sum Daily Sales Aggregation],
+			        'D_Date'[Date] = PrevDay
+			    ),
+			
+			    /* ================= WEEK ================= */
+			    ISINSCOPE ( 'D_Date'[WeekOfYear] ),
+			    CALCULATE(
+			        [Sum Daily Sales Aggregation],
+			        'D_Date'[Date] <= PrevWeekEnd &&
+			        'D_Date'[Date] >= PrevWeekEnd - 6,  -- assuming 7-day week
+			        REMOVEFILTERS('D_Date'[MonthNo], 'D_Date'[QuarterNumber])
+			    )
+			)
+		isHidden
+		displayFolder: WIP Measures
+		lineageTag: 1c28dd18-ae90-4c6f-a42e-227b1bbaf091
+
+		changedProperty = IsHidden
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure 'Sales Aggregation Last Quarter' =
+			
+			
+			VAR CurrentQuarterKey =
+			    MAX ( 'D_Date'[YearQuarterInteger] )
+			
+			VAR PreviousQuarterKey =
+			    MAXX (
+			        FILTER (
+			            ALL ( 'D_Date'[YearQuarterInteger] ),
+			            'D_Date'[YearQuarterInteger] < CurrentQuarterKey
+			                && NOT ISBLANK (
+			                    CALCULATE (
+			                        [Sales Aggregation],
+			                        REMOVEFILTERS ( 'D_Date' ),
+			                        'D_Date'[YearQuarterInteger] = EARLIER ( 'D_Date'[YearQuarterInteger] )
+			                    )
+			                )
+			        ),
+			        'D_Date'[YearQuarterInteger]
+			    )
+			
+			RETURN
+			CALCULATE (
+			    [Sales Aggregation],
+			    REMOVEFILTERS ( 'D_Date' ),
+			    'D_Date'[YearQuarterInteger] = PreviousQuarterKey
+			)
+		displayFolder: Sales Aggregation
+		lineageTag: 24e2a949-0219-47f1-bb3f-173f2a29bbb9
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure 'Sales Aggregation Last Year 2' =
+			
+			
+			VAR CurrentQuarterKey =
+			    MAX ( 'D_Date'[Year] )
+			
+			VAR PreviousQuarterKey =
+			    MAXX (
+			        FILTER (
+			            ALL ( 'D_Date'[Year] ),
+			            'D_Date'[Year] < CurrentQuarterKey
+			                && NOT ISBLANK (
+			                    CALCULATE (
+			                        [Sales Aggregation],
+			                        REMOVEFILTERS ( 'D_Date' ),
+			                        'D_Date'[Year] = EARLIER ( 'D_Date'[Year] )
+			                    )
+			                )
+			        ),
+			        'D_Date'[Year]
+			    )
+			
+			RETURN
+			CALCULATE (
+			    [Sales Aggregation],
+			    REMOVEFILTERS ( 'D_Date' ),
+			    'D_Date'[Year] = PreviousQuarterKey
+			)
+		displayFolder: Sales Aggregation
+		lineageTag: 3e91ef05-fa5c-4bd1-b3a9-ff6b919ef948
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure 'Sales Aggregation Last Month' =
+			
+			
+			VAR CurrentMonthKey =
+			    MAX ( 'D_Date'[YearMonthInteger] )
+			
+			VAR PreviousMonthKey =
+			    MAXX (
+			        FILTER (
+			            ALL ( 'D_Date'[YearMonthInteger] ),
+			            'D_Date'[YearMonthInteger] < CurrentMonthKey
+			                && NOT ISBLANK (
+			                    CALCULATE (
+			                        [Sales Aggregation],
+			                        REMOVEFILTERS ( 'D_Date' ),
+			                        'D_Date'[YearMonthInteger] = EARLIER ( 'D_Date'[YearMonthInteger] )
+			                    )
+			                )
+			        ),
+			        'D_Date'[YearMonthInteger]
+			    )
+			
+			RETURN
+			CALCULATE (
+			    [Sales Aggregation],
+			    REMOVEFILTERS ( 'D_Date' ),
+			    'D_Date'[YearMonthInteger] = PreviousMonthKey
+			)
+		displayFolder: Sales Aggregation
+		lineageTag: 1676d97c-fa34-48ce-ab08-9b5e1fea0e25
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure 'Sales Aggregation Previous Period' = ```
+			
+			VAR IsYearInScope =
+			    ISINSCOPE('D_Date'[Year])
+			
+			VAR IsQuarterInScope =
+			    ISINSCOPE('D_Date'[Quarter]) ||
+			    ISINSCOPE('D_Date'[QuarterNumber]) ||
+			    ISINSCOPE('D_Date'[Year/Quarter]) ||
+			    ISINSCOPE('D_Date'[YearQuarterInteger])
+			
+			VAR IsMonthInScope =
+			    ISINSCOPE('D_Date'[MonthNo]) ||
+			    ISINSCOPE('D_Date'[MonthLong]) ||
+			    ISINSCOPE('D_Date'[MonthShort]) ||
+			    ISINSCOPE('D_Date'[YearMonth]) ||
+			    ISINSCOPE('D_Date'[YearMonthInteger])
+			
+			RETURN
+			SWITCH (
+			    TRUE(),
+			    IsMonthInScope,   [Sales Aggregation Last Month],
+			    IsQuarterInScope, [Sales Aggregation Last Quarter],
+			    IsYearInScope,    [Sales Aggregation Last Year]
+			)
+			
+			```
+		displayFolder: Sales Aggregation
+		lineageTag: 1e048cf7-7263-4320-9a1a-ca971c077201
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure 'Sales Aggregation Change %' =
+			
+			DIVIDE(
+			    [Sales Aggregation Previous Period] - [Sales Aggregation],
+			    [Sales Aggregation Previous Period]
+			)
+		formatString: 0.00\ %;-0.00\ %;0.00\ %
+		displayFolder: Sales Delta Measures
+		lineageTag: 87bde040-8566-48c4-9682-bc418064faf7
+
+	partition Main_Measures = m
+		mode: import
+		source =
+				let
+				    Source = Table.FromRows(Json.Document(Binary.Decompress(Binary.FromText("i44FAA==", BinaryEncoding.Base64), Compression.Deflate)), let _t = ((type nullable text) meta [Serialized.Text = true]) in type table [Column1 = _t]),
+				    #"Changed Type" = Table.TransformColumnTypes(Source,{{"Column1", type text}}),
+				    #"Removed Columns" = Table.RemoveColumns(#"Changed Type",{"Column1"})
+				in
+				    #"Removed Columns"
+
+	changedProperty = Name
+
+	annotation PBI_ResultType = Table
+

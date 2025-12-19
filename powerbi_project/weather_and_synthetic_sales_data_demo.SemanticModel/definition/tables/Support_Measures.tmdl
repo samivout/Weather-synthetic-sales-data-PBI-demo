@@ -1,0 +1,184 @@
+table Support_Measures
+	lineageTag: c279b735-2ae8-4e47-8ea6-ca6b672f021b
+
+	measure MaxAbsoluteColorScale =
+			
+			[Sales Aggregation] * [MaxRelativeColorScale]
+		displayFolder: Colorscale Control
+		lineageTag: dbd64035-ab61-4473-aa76-c6dfe023b799
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure MaxRelativeColorScale =
+			
+			MAX('L_Color_Scale_Value'[RelativeValue])
+		displayFolder: Colorscale Control
+		lineageTag: 7f255524-867d-471d-a61d-76b6854c881b
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure MinRelativeColorScale =
+			
+			MIN('L_Color_Scale_Value'[RelativeValue])
+		displayFolder: Colorscale Control
+		lineageTag: 61cecc7b-3c20-408d-84f9-64d44f552457
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure 'Distance From Peak Hour' = ```
+			
+			VAR PeakHour =
+			    CALCULATE(
+			        [Hour Of Peak Sales],
+			        REMOVEFILTERS('F_Sales'[Hour])
+			    )
+			VAR CurrentHour =
+			    SELECTEDVALUE('F_Sales'[Hour])
+			RETURN
+			ABS(CurrentHour - PeakHour)
+			
+			```
+		displayFolder: Sales-Hour Correlation
+		lineageTag: b663d7ab-1029-4dbc-8e59-61fbd0a32b54
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure 'Hour Of Peak Sales' = ```
+			
+			VAR __AllHours =
+			    SUMMARIZE(
+			        ALL('D_Time'[Hour]),   -- consider all hours
+			        'D_Time'[Hour],
+			        "SalesSum", [Sales Sum]
+			    )
+			VAR MaxSales = MAXX(__AllHours, [SalesSum])
+			RETURN
+			MAXX(
+			    FILTER(__AllHours, [SalesSum] = MaxSales),
+			    'D_Time'[Hour]
+			)
+			
+			```
+		displayFolder: Sales-Hour Correlation
+		lineageTag: 3964da39-6ebd-4664-b0aa-03e44c40998d
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure 'Drill Through Title Location' =
+			
+			"Details for " & SELECTEDVALUE('D_Location'[Location], "Unknown Location")
+		displayFolder: Dynamic Title Measures
+		lineageTag: 68fe7b67-3dbd-47ca-a40c-76c43a36e10d
+
+	measure 'Drill Through Title Person' =
+			
+			SELECTEDVALUE('D_Salesperson'[Name], "Unknown Person")
+		displayFolder: Dynamic Title Measures
+		lineageTag: 936477e5-3a28-434c-bff0-d2e134d7c1ea
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure 'Number Of Events In Range Absolute' =
+			
+			VAR OriginalContext =
+			    CALCULATE(
+			        COUNTROWS('F_Sales'),
+			        REMOVEFILTERS(DateAggregation[Date Aggregation]),
+			        REMOVEFILTERS(LocationAggregation[Location Aggregation])
+			    )
+			RETURN
+			OriginalContext
+		displayFolder: Events In Range Measures
+		lineageTag: f4d004d9-24aa-42f6-9c42-8776dfb6f02b
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure 'Number Of Events In Range Relative' = ```
+			
+			VAR Denominator =
+			    CALCULATE(
+			        [Number Of Events In Range Absolute], // Clear just the filters you want to normalize over:
+			        ALL('F_Sales')
+			    )
+			RETURN
+			DIVIDE([Number Of Events In Range Absolute], Denominator)
+			
+			```
+		displayFolder: Events In Range Measures
+		lineageTag: 915f9a9d-b529-4a02-8d67-559011eb08c5
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure 'Salesperson Locales (Title)' = ```
+			
+			VAR Locales =
+			    CALCULATETABLE (
+			        VALUES ( 'D_Location'[Location] ),
+			        REMOVEFILTERS ( 'D_Location' )
+			    )
+			VAR LocaleCount =
+			    COUNTROWS ( Locales )
+			VAR Result =
+			    SWITCH (
+			        TRUE (),
+			        LocaleCount = 0, "No locale",
+			        LocaleCount = 1, MAXX ( Locales, 'D_Location'[Location] ),
+			        LocaleCount <= 3,
+			            CONCATENATEX (
+			                Locales,
+			                'D_Location'[Location],
+			                ", "
+			            ),
+			        "Multiple locales"
+			    )
+			RETURN
+			    Result
+			
+			```
+		displayFolder: Dynamic Title Measures
+		lineageTag: c9d01763-3e54-424e-beef-3ac4298f6314
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	measure 'Salesperson Location Name' = ```
+			
+			CALCULATE(
+			    SELECTEDVALUE('D_Location'[Location]),
+			    USERELATIONSHIP('D_Salesperson'[location_id], 'D_Location'[location_id])
+			)
+			
+			```
+		displayFolder: Dynamic Title Measures
+		lineageTag: 1e65f685-2f41-4f09-9d33-135e23ee16c3
+
+	measure 'Product Available at Location' = ```
+			
+			IF (
+			    COUNTROWS (
+			        FILTER (
+			            F_Product_Location,
+			            F_Product_Location[product_id] = SELECTEDVALUE ( D_Product[product_id] )
+			                && F_Product_Location[location_id] = SELECTEDVALUE ( D_Location[location_id] )
+			        )
+			    ) > 0,
+			    1,
+			    0
+			)
+			
+			```
+		lineageTag: 30cc3e4e-4afe-405d-a318-1a0d5aa3c830
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	partition Support_Measures = m
+		mode: import
+		source =
+				let
+				    Source = Table.FromRows(Json.Document(Binary.Decompress(Binary.FromText("i44FAA==", BinaryEncoding.Base64), Compression.Deflate)), let _t = ((type nullable text) meta [Serialized.Text = true]) in type table [Column1 = _t]),
+				    #"Changed Type" = Table.TransformColumnTypes(Source,{{"Column1", type text}}),
+				    #"Removed Columns" = Table.RemoveColumns(#"Changed Type",{"Column1"})
+				in
+				    #"Removed Columns"
+
+	annotation PBI_ResultType = Table
+

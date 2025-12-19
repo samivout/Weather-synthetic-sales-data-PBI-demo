@@ -1,0 +1,11 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/gitIntegration/platformProperties/2.0.0/schema.json",
+  "metadata": {
+    "type": "Report",
+    "displayName": "weather_and_synthetic_sales_data_demo"
+  },
+  "config": {
+    "version": "2.0",
+    "logicalId": "11b14ec9-441e-4a35-890c-1e24576c6361"
+  }
+}

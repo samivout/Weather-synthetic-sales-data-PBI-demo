@@ -1,0 +1,38 @@
+table L_Color_Scale_Value
+	lineageTag: add2ea3c-9f40-421d-bb97-7ae3f4ca9cc5
+
+	column Value
+		formatString: 0
+		lineageTag: 59c3b4c2-b03e-41e9-90a9-96bc193d64aa
+		summarizeBy: sum
+		isNameInferred
+		sourceColumn: [Value]
+
+		annotation SummarizationSetBy = Automatic
+
+	column RelativeValue
+		lineageTag: e111562b-83c2-45c7-accf-1b6cabc0c762
+		summarizeBy: sum
+		isNameInferred
+		sourceColumn: [RelativeValue]
+
+		annotation SummarizationSetBy = Automatic
+
+		annotation PBI_FormatHint = {"isGeneralNumber":true}
+
+	partition L_Color_Scale_Value = calculated
+		mode: import
+		source = ```
+				
+				VAR BinCount = 1000
+				VAR BinSize  = 1 / BinCount
+				RETURN
+				ADDCOLUMNS (
+				    GENERATESERIES ( 0, BinCount - 1, 1 ),
+				    "RelativeValue", ([Value] + 1) / BinCount
+				)
+				
+				```
+
+	annotation PBI_Id = 4a56ae477d434db0bfc099f2f62448d9
+

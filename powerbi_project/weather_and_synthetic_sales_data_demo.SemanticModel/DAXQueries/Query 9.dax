@@ -1,0 +1,34 @@
+EVALUATE
+
+VAR __SELECTEDYEAR = YEAR(MAX('DateTable'[Date]))
+
+VAR __FILTEREDTABLE =
+    FILTER(
+        'DateTable',
+        'DateTable'[Year] <> __SELECTEDYEAR
+        )
+		
+VAR __DS0FilterTable = 
+		TREATAS(
+			{[SelectedAggregationDimensions]},
+			'Aggregation Dimensions'[Aggregation Dimensions Fields]
+		)
+
+VAR __TABLE =
+    SUMMARIZE(
+        'sales_data',
+        'DateTable'[Date],
+        "MeasureValue", [SalesSum],
+        "RowPropWeight", DIVIDE(COUNTROWS('sales_data'), CALCULATE(COUNTROWS('sales_data'), ALL('sales_data'))),
+		"SumPropWeight", DIVIDE(SUM('sales_data'[sales]), CALCULATE(SUM('sales_data'[sales]), ALL('sales_data')))
+    )
+	
+	VAR __SUMWEIGHT =
+		SUMX(
+			__TABLE,
+			[RowPropWeight]
+		)
+
+RETURN
+    __DS0FilterTable
+	// ROW("Ree", __SUMWEIGHT)

@@ -1,0 +1,223 @@
+createOrReplace
+
+	table WeatherIndexAggregationTemporalFirst
+		lineageTag: 16c4ef73-50b9-421d-827c-0404b3cdeec7
+
+		calculationGroup
+			precedence: 160
+
+			calculationItem None = SELECTEDMEASURE()
+
+			calculationItem 'Sum By Weather Index' = ```
+					
+					Var Categories =
+					    VALUES('WeatherIndexBins'[BinID])
+					
+					Var CalcByCategory =
+					    ADDCOLUMNS(
+					        Categories,
+					        "MeasureValue", CALCULATE(SELECTEDMEASURE())
+					    )
+					
+					VAR InclusionCheck = SELECTEDMEASURENAME() IN VALUES('CalculationGroupInclusionTable'[WeatherIndexAggregation]) && 
+					                     SELECTEDMEASURENAME() IN VALUES('AggregationTypeInclusionTable'[Sum])
+					
+					VAR MeasureEvaluation =
+					    IF(
+					        InclusionCheck,
+					        SUMX(CalcByCategory, [MeasureValue]),
+					        SELECTEDMEASURE()
+					    )
+					    
+					RETURN
+					    MeasureEvaluation
+					```
+
+			calculationItem 'Weighted Average By Weather Index' = ```
+					
+					VAR InclusionCheck = SELECTEDMEASURENAME() IN VALUES('CalculationGroupInclusionTable'[WeatherIndexAggregation]) && 
+					                     SELECTEDMEASURENAME() IN VALUES('AggregationTypeInclusionTable'[Average])
+					
+					VAR Categories =
+					    SUMMARIZE(
+					        'WeatherIndexBins',
+					        'WeatherIndexBins'[BinID],
+					        "MeasureValue", SELECTEDMEASURE(),
+					        "Weight", SUM('sales_data'[sales])
+					    )
+					
+					VAR WeightedAverageEvaluation =
+					    DIVIDE(
+					        SUMX(Categories, [MeasureValue] * [Weight]),
+					        SUMX(Categories, [Weight])
+					    )
+					
+					RETURN
+					    IF(
+					        InclusionCheck,
+					        WeightedAverageEvaluation,
+					        SELECTEDMEASURE()
+					    )
+					```
+
+			calculationItem 'Weighted Median By Weather Index' = ```
+					
+					
+					VAR InclusionCheck = SELECTEDMEASURENAME() IN VALUES('CalculationGroupInclusionTable'[WeatherIndexAggregation]) && 
+					                     SELECTEDMEASURENAME() IN VALUES('AggregationTypeInclusionTable'[Median])
+					
+					Var Categories =
+					    ADDCOLUMNS(
+					        SUMMARIZE(
+					            'WeatherIndexBins',
+					            'WeatherIndexBins'[BinID],
+					            "MeasureValue", SELECTEDMEASURE(),
+					            "Weight", SUM('sales_data'[sales])
+					        ),
+					        "InnerSort", [MeasureValue]
+					    )
+					
+					VAR TotalWeight =
+					    SUMX(Categories, [Weight])
+					
+					VAR HalfWeight =
+					    TotalWeight / 2
+					
+					Var WeightedTable =
+					    ADDCOLUMNS(
+					        Categories,
+					        "CumulativeWeight",
+					            VAR CurrentValue = [InnerSort]
+					            RETURN
+					                SUMX(
+					                    FILTER(Categories, [InnerSort] <= CurrentValue),
+					                    [Weight]
+					                )
+					    )
+					
+					VAR WeightedEvaluation =
+					    MINX(
+					        FILTER(WeightedTable, [CumulativeWeight] >= HalfWeight),
+					        [InnerSort]
+					    )
+					
+					RETURN
+					    IF(
+					        InclusionCheck,
+					        WeightedEvaluation,
+					        SELECTEDMEASURE()
+					    )
+					```
+
+			calculationItem 'Max By Weather Index' = ```
+					
+					Var Categories =
+					    VALUES('WeatherIndexBins'[BinID])
+					
+					Var CalcByCategory =
+					    ADDCOLUMNS(
+					        Categories,
+					        "MeasureValue", CALCULATE(SELECTEDMEASURE())
+					    )
+					
+					VAR InclusionCheck = SELECTEDMEASURENAME() IN VALUES('CalculationGroupInclusionTable'[WeatherIndexAggregation]) && 
+					                     SELECTEDMEASURENAME() IN VALUES('AggregationTypeInclusionTable'[Max])
+					
+					VAR MeasureEvaluation =
+					    IF(
+					        InclusionCheck,
+					        MAXX(CalcByCategory, [MeasureValue]),
+					        SELECTEDMEASURE()
+					    )
+					    
+					RETURN
+					    MeasureEvaluation
+					```
+
+			calculationItem 'Min By Weather Index' = ```
+					
+					Var Categories =
+					    VALUES('WeatherIndexBins'[BinID])
+					
+					Var CalcByCategory =
+					    ADDCOLUMNS(
+					        Categories,
+					        "MeasureValue", CALCULATE(SELECTEDMEASURE())
+					    )
+					
+					VAR InclusionCheck = SELECTEDMEASURENAME() IN VALUES('CalculationGroupInclusionTable'[WeatherIndexAggregation]) && 
+					                     SELECTEDMEASURENAME() IN VALUES('AggregationTypeInclusionTable'[Min])
+					
+					VAR MeasureEvaluation =
+					    IF(
+					        InclusionCheck,
+					        MINX(CalcByCategory, [MeasureValue]),
+					        SELECTEDMEASURE()
+					    )
+					    
+					RETURN
+					    MeasureEvaluation
+					```
+
+			calculationItem 'Weighted Sdev By Weather Index' = ```
+					
+					VAR InclusionCheck = SELECTEDMEASURENAME() IN VALUES('CalculationGroupInclusionTable'[WeatherIndexAggregation]) && 
+					                     SELECTEDMEASURENAME() IN VALUES('AggregationTypeInclusionTable'[Sdev])
+					
+					Var Categories =
+					    ADDCOLUMNS(
+					        SUMMARIZE(
+					            'WeatherIndexBins',
+					            'WeatherIndexBins'[BinID],
+					            "MeasureValue", SELECTEDMEASURE(),
+					            "Weight", SUM('sales_data'[sales])
+					        ),
+					        "InnerSort", [MeasureValue]
+					    )
+					
+					VAR TotalWeight =
+					    SUMX(Categories, [Weight])
+					
+					VAR WeightedMean =
+					    DIVIDE(
+					        SUMX(Categories, [Weight] * [MeasureValue]),
+					        TotalWeight
+					    )
+					
+					VAR WeightedEvaluation =
+					    SQRT(
+					        DIVIDE(
+					            SUMX(
+					                Categories,
+					                [Weight] * POWER([MeasureValue] - WeightedMean, 2)
+					            ),
+					            TotalWeight
+					        )
+					    )
+					
+					RETURN
+					    IF(
+					        InclusionCheck,
+					        WeightedEvaluation,
+					        SELECTEDMEASURE()
+					    )
+					```
+
+		column 'Weather Index Aggregation'
+			dataType: string
+			lineageTag: 2f855483-b59c-474b-a43b-7e963f4e6010
+			summarizeBy: none
+			sourceColumn: Name
+			sortByColumn: Ordinal
+
+			annotation SummarizationSetBy = Automatic
+
+		column Ordinal
+			dataType: int64
+			formatString: 0
+			lineageTag: ee1b9fe6-4139-4330-ab2f-cfd555f58c28
+			summarizeBy: sum
+			sourceColumn: Ordinal
+
+			annotation SummarizationSetBy = Automatic
+

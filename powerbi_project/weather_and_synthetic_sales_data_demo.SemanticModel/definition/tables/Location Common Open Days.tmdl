@@ -1,0 +1,38 @@
+table 'Location Common Open Days'
+	lineageTag: 3b895574-7f9a-4bc7-a144-0863a689bcb5
+
+	calculationGroup
+		precedence: 8000
+
+		calculationItem 'Only Common Open Days' =
+				
+				VAR CommonStart = MAXX('D_Location', 'D_Location'[open_days_start])
+				VAR CommonEnd   = MINX('D_Location', 'D_Location'[open_days_end])
+				RETURN
+				CALCULATE(
+				    SELECTEDMEASURE(),
+				    FILTER(
+				        'F_Sales',
+				        WEEKDAY('F_Sales'[Date], 3) >= CommonStart &&
+				        WEEKDAY('F_Sales'[Date], 3) <= CommonEnd
+				    )
+				)
+
+	column 'Calculation group column'
+		dataType: string
+		lineageTag: de8a6e57-f3dd-47b0-93c5-ee0ce8cb52c2
+		summarizeBy: none
+		sourceColumn: Name
+		sortByColumn: Ordinal
+
+		annotation SummarizationSetBy = Automatic
+
+	column Ordinal
+		dataType: int64
+		formatString: 0
+		lineageTag: 12a7868f-ca99-4ea9-9513-3cf89ddd9a9c
+		summarizeBy: sum
+		sourceColumn: Ordinal
+
+		annotation SummarizationSetBy = Automatic
+

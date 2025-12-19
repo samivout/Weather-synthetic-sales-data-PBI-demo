@@ -1,0 +1,69 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/bookmarksMetadata/1.0.0/schema.json",
+  "items": [
+    {
+      "name": "ef7cb3a8520358ea1a0d",
+      "displayName": "Heatmap Page Aggregations",
+      "children": [
+        "153d9f0a02ab05b40d79",
+        "aacc745887278c3190a0"
+      ]
+    },
+    {
+      "name": "a8d11c4fa4dba969f573",
+      "displayName": "Location Analytics Page Aggregations",
+      "children": [
+        "e64042f34a9b269f37b8",
+        "402b1bb79d0a8efc8905"
+      ]
+    },
+    {
+      "name": "6d7e8bb4bc7791a838d3",
+      "displayName": "Sales—Weather Scatter Play Axis Bookmarks",
+      "children": [
+        "f22680366045df5db9a4",
+        "87bbf5c55b3f600afc99"
+      ]
+    },
+    {
+      "name": "c9097ef0598203d28a70",
+      "displayName": "Sales—Weather Scatter Aggregations",
+      "children": [
+        "28cb95237deedc86a598",
+        "fee0bc1737fdb833ce32"
+      ]
+    },
+    {
+      "name": "493cf763091c069d11ef",
+      "displayName": "Sales Decomposition Aggregations",
+      "children": [
+        "db11f3578d0cb781adae",
+        "37777900ce3a36cd5dc3"
+      ]
+    },
+    {
+      "name": "387422b93d9a869c48da",
+      "displayName": "Person Drillthrough Aggregations",
+      "children": [
+        "aa6d42279694dff234e8",
+        "9059e4993d22428c60f8"
+      ]
+    },
+    {
+      "name": "3353f795cb4665359ff1",
+      "displayName": "Location Drillthrough Aggregations",
+      "children": [
+        "3298fddaa10bdd76db40",
+        "9706fdbc9af83aa85b20"
+      ]
+    },
+    {
+      "name": "09cd5290093d12c502c3",
+      "displayName": "Hypothetical Sales Loss By Weather Aggregations",
+      "children": [
+        "4c589774b388d940e54a",
+        "904f9c3407a79c4c0dc8"
+      ]
+    }
+  ]
+}

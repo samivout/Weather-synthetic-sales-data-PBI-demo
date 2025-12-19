@@ -1,0 +1,12 @@
+DEFINE
+    MEASURE 'HourlyMeasureDefinitions'[SumOfHourlySales] = SUM(sales_data[sales])
+    MEASURE 'DailyMeasureDefinitions'[MeanSales] = AVERAGEX(
+    VALUES('sales_data'[Hour]),
+    CALCULATE([SumOfHourlySales])
+)
+
+EVALUATE
+    SUMMARIZECOLUMNS(
+        "SumOfHourlySales", [SumOfHourlySales],
+        "MeanSales", [MeanSales]
+    )

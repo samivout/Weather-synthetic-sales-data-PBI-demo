@@ -1,0 +1,56 @@
+table 'Aggregation Dimensions Fieldparameters'
+	lineageTag: 74fbc526-c0f0-48fe-8d14-26af16c084c8
+
+	column 'Aggregation Dimensions'
+		lineageTag: c512e32a-45c8-4fc8-91b5-e9d4f49a9306
+		summarizeBy: none
+		sourceColumn: [Value1]
+		sortByColumn: 'Aggregation Dimensions Order'
+
+		relatedColumnDetails
+			groupByColumn: 'Aggregation Dimensions Fields'
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Aggregation Dimensions Fields'
+		isHidden
+		lineageTag: fe0f393b-685f-44c2-935d-bb56f3777b4f
+		summarizeBy: none
+		sourceColumn: [Value2]
+		sortByColumn: 'Aggregation Dimensions Order'
+
+		extendedProperty ParameterMetadata =
+				{
+				  "version": 3,
+				  "kind": 2
+				}
+
+		annotation SummarizationSetBy = Automatic
+
+	column 'Aggregation Dimensions Order'
+		isHidden
+		formatString: 0
+		lineageTag: 2e149fa0-ba87-41b4-9bf3-a8c1e6ef3d8a
+		summarizeBy: sum
+		sourceColumn: [Value3]
+
+		annotation SummarizationSetBy = Automatic
+
+	partition 'Aggregation Dimensions Fieldparameters' = calculated
+		mode: import
+		source =
+				{
+				    ("Product", NAMEOF('D_Product'[Product]), 1),
+				    ("Location", NAMEOF('D_Location'[Location]), 0),
+				    ("Person", NAMEOF('D_Salesperson'[Name]), 2),
+				    ("Year", NAMEOF('D_Date'[Year]), 3),
+				    ("Quarter", NAMEOF('D_Date'[Quarter]), 4),
+				    ("Month", NAMEOF('D_Date'[MonthNo]), 5),
+				    ("Week", NAMEOF('D_Date'[WeekOfYear]), 6),
+				    ("Date", NAMEOF('D_Date'[Date]), 7),
+				    ("Hour", NAMEOF('D_Time'[Hour]), 8),
+				    ("Weather Index Bin", NAMEOF('D_Weather_Index_Bins'[BinEnd]), 9)
+				}
+
+	annotation PBI_Id = c0e6c8b90cca454ca5b925cb0f08b30a
+

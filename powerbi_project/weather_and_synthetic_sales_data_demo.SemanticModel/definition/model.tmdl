@@ -1,0 +1,53 @@
+model Model
+	culture: en-US
+	defaultPowerBIDataSourceVersion: powerBI_V3
+	discourageImplicitMeasures
+	sourceQueryCulture: fi-FI
+	dataAccessOptions
+		legacyRedirects
+		returnErrorValuesAsNull
+
+annotation __PBI_TimeIntelligenceEnabled = 1
+
+annotation PBI_ProTooling = ["DevMode","DaxQueryView_Desktop","CalcGroup","TMDLView_Desktop"]
+
+annotation PBI_QueryOrder = ["F_Sales","weather_data","D_Salesperson","D_Location","D_Product","F_Product_Location","D_Product_Category","Aggregation Type Inclusion","Calculation Group Inclusion","L_Atomic_Measure_Names","Main_Measures","Support_Measures"]
+
+annotation __TEdtr = 1
+
+ref table F_Sales
+ref table D_Salesperson
+ref table D_Location
+ref table D_Product
+ref table F_Product_Location
+ref table D_Product_Category
+ref table D_Date
+ref table D_Time
+ref table D_Weather_Index_Bins
+ref table LocationAggregation
+ref table DateAggregation
+ref table L_Color_Scale_Value
+ref table 'Location Common Open Hours'
+ref table 'Location Common Open Days'
+ref table 'Use Full Axis'
+ref table RemoveWeatherDuplicates
+ref table HourAggregation
+ref table PersonAggregation
+ref table 'Aggregation Type Inclusion'
+ref table 'Calculation Group Inclusion'
+ref table ProductAggregation
+ref table HourAggregationTemporalFirst
+ref table DateAggregationTemporalFirst
+ref table ProductAggregationTemporalFirst
+ref table PersonAggregationTemporalFirst
+ref table LocationAggregationTemporalFirst
+ref table L_Atomic_Measure_Names
+ref table WeatherIndexAggregation
+ref table WeatherIndexAggregationTemporalFirst
+ref table 'Aggregation Dimensions Fieldparameters'
+ref table L_Top_N_Products
+ref table Main_Measures
+ref table Support_Measures
+
+ref cultureInfo en-US
+

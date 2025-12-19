@@ -1,0 +1,67 @@
+table 'Calculation Group Inclusion'
+	lineageTag: 434963ba-38b4-44d0-897f-aea0c582a032
+
+	column PersonAggregation
+		dataType: string
+		lineageTag: d5d2bf2b-2bfe-4057-91d2-a799a302b3c1
+		summarizeBy: none
+		sourceColumn: PersonAggregation
+
+		annotation SummarizationSetBy = Automatic
+
+	column LocationAggregation
+		dataType: string
+		lineageTag: 65596281-4287-498b-b5f4-6086772e3297
+		summarizeBy: none
+		sourceColumn: LocationAggregation
+
+		annotation SummarizationSetBy = Automatic
+
+	column HourAggregation
+		dataType: string
+		lineageTag: 609cf235-e8dc-47ac-b9f0-20571dc3ea5b
+		summarizeBy: none
+		sourceColumn: HourAggregation
+
+		annotation SummarizationSetBy = Automatic
+
+	column DateAggregation
+		dataType: string
+		lineageTag: 15feddbd-95f0-44ca-bbda-1f65032469c0
+		summarizeBy: none
+		sourceColumn: DateAggregation
+
+		annotation SummarizationSetBy = Automatic
+
+	column ProductAggregation
+		dataType: string
+		lineageTag: a7ee11d0-9e47-490c-9eb9-9c0b08fb431f
+		summarizeBy: none
+		sourceColumn: ProductAggregation
+
+		annotation SummarizationSetBy = Automatic
+
+	column WeatherIndexAggregation
+		dataType: string
+		lineageTag: e315a27f-5b19-4103-9218-950c9863fc4a
+		summarizeBy: none
+		sourceColumn: WeatherIndexAggregation
+
+		annotation SummarizationSetBy = Automatic
+
+	partition 'Calculation Group Inclusion' = m
+		mode: import
+		source =
+				let
+				    Source = Excel.Workbook(File.Contents("C:\dev\Samin_PBI_demo\powerbi_project\CalculationGroupInclusionTable.xlsx"), null, true),
+				    Taulukko2_Table = Source{[Item="Taulukko2",Kind="Table"]}[Data],
+				    #"Changed Type" = Table.TransformColumnTypes(Taulukko2_Table,{{"PersonAggregation", type text}, {"LocationAggregation", type text}, {"HourAggregation", type text}, {"DateAggregation", type text}})
+				in
+				    #"Changed Type"
+
+	changedProperty = Name
+
+	annotation PBI_NavigationStepName = Navigation
+
+	annotation PBI_ResultType = Table
+

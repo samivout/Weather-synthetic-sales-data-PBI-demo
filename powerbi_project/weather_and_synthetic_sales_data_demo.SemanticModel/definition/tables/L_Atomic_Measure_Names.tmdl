@@ -1,0 +1,38 @@
+table L_Atomic_Measure_Names
+	lineageTag: d2a4af46-2a7a-4647-9136-33f3aec7897d
+
+	column 'Measure name'
+		dataType: string
+		lineageTag: 61a187be-7a04-4abd-93e5-a0f55c930ec4
+		summarizeBy: none
+		sourceColumn: Measure name
+		sortByColumn: SortOrder
+
+		changedProperty = SortByColumn
+
+		annotation SummarizationSetBy = Automatic
+
+	column SortOrder
+		dataType: string
+		lineageTag: 70af2246-d5b1-43db-a018-e57b95dfc223
+		summarizeBy: none
+		sourceColumn: SortOrder
+
+		changedProperty = SortByColumn
+
+		annotation SummarizationSetBy = Automatic
+
+	partition L_Atomic_Measure_Names = m
+		mode: import
+		source =
+				let
+				    Source = Excel.Workbook(File.Contents("C:\dev\Samin_PBI_demo\powerbi_project\AtomicMeasuresTable.xlsx"), null, true),
+				    Taulukko1_Table = Source{[Item="Taulukko1",Kind="Table"]}[Data],
+				    #"Changed Type" = Table.TransformColumnTypes(Taulukko1_Table,{{"Measure name", type text}})
+				in
+				    #"Changed Type"
+
+	changedProperty = Name
+
+	annotation PBI_ResultType = Table
+

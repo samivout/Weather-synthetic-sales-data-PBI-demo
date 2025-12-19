@@ -1,0 +1,15 @@
+expression weather_data =
+		let
+		    Source = Parquet.Document(File.Contents("file:///C:/dev/data/delta/test_weather_data_latest.parquet"), [Compression=null, LegacyColumnNameEncoding=false, MaxDepth=null]),
+		    #"Added Custom" = Table.AddColumn(Source, "Date", each Date.From([timestamp])),
+		    #"Added Custom1" = Table.AddColumn(#"Added Custom", "Hour", each Time.Hour([timestamp])),
+		    #"Removed Columns" = Table.RemoveColumns(#"Added Custom1",{"timestamp"}),
+		    #"Changed Type" = Table.TransformColumnTypes(#"Removed Columns",{{"Date", type date}, {"Hour", Int64.Type}})
+		in
+		    #"Changed Type"
+	lineageTag: 0aa03238-f3f2-46f3-ab1c-90f4b513a085
+
+	annotation PBI_NavigationStepName = Navigation
+
+	annotation PBI_ResultType = Table
+

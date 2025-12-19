@@ -1,0 +1,38 @@
+table 'Location Common Open Hours'
+	lineageTag: 30a95e9b-f4a5-4d64-a3b1-624142d315d2
+
+	calculationGroup
+		precedence: 9000
+
+		calculationItem 'Only Common Open Hours' =
+				
+				VAR CommonStart = MAXX('D_Location', 'D_Location'[open_hours_start])
+				VAR CommonEnd   = MINX('D_Location', 'D_Location'[open_hours_end])
+				RETURN
+				CALCULATE(
+				    SELECTEDMEASURE(),
+				    FILTER(
+				        D_Time,
+				        D_Time[Hour] >= CommonStart &&
+				        D_Time[Hour] <= CommonEnd
+				    )
+				)
+
+	column 'Calculation group column'
+		dataType: string
+		lineageTag: 8f610ea0-1156-4a5b-85cd-a793857fd7ad
+		summarizeBy: none
+		sourceColumn: Name
+		sortByColumn: Ordinal
+
+		annotation SummarizationSetBy = Automatic
+
+	column Ordinal
+		dataType: int64
+		formatString: 0
+		lineageTag: 11de6ef4-dbe1-4437-b862-43005ab138cb
+		summarizeBy: sum
+		sourceColumn: Ordinal
+
+		annotation SummarizationSetBy = Automatic
+

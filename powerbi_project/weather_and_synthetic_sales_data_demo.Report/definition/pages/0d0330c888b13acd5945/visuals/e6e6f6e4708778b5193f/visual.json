@@ -1,0 +1,69 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/fabric/item/report/definition/visualContainer/2.4.0/schema.json",
+  "name": "e6e6f6e4708778b5193f",
+  "position": {
+    "x": 334.46327683615817,
+    "y": 323.01318267419964,
+    "z": 2,
+    "height": 147.04331450094162,
+    "width": 619.51035781544249,
+    "tabOrder": 2
+  },
+  "visual": {
+    "visualType": "textbox",
+    "objects": {
+      "general": [
+        {
+          "properties": {
+            "paragraphs": [
+              {
+                "textRuns": [
+                  {
+                    "value": "The repository associated with this demo project is available on GitHub at "
+                  },
+                  {
+                    "value": "https://github.com/samivout/Weather-synthetic-sales-data-PBI-demo",
+                    "textStyle": {},
+                    "url": "https://github.com/samivout/Weather-synthetic-sales-data-PBI-demo"
+                  },
+                  {
+                    "value": " ."
+                  }
+                ]
+              },
+              {
+                "textRuns": [
+                  {
+                    "value": ""
+                  }
+                ]
+              },
+              {
+                "textRuns": [
+                  {
+                    "value": "The repository contains both the Python package used to fetch the weather data from the FMI API and generate the synthetic data against it, as well as the project folder format of this report."
+                  }
+                ]
+              },
+              {
+                "textRuns": [
+                  {
+                    "value": ""
+                  }
+                ]
+              },
+              {
+                "textRuns": [
+                  {
+                    "value": "If the visualizations on the Sales—Weather—Hour Heatmap page do not work, you need to install / import the third-party Deneb visual."
+                  }
+                ]
+              }
+            ]
+          }
+        }
+      ]
+    },
+    "drillFilterOtherVisuals": true
+  }
+}

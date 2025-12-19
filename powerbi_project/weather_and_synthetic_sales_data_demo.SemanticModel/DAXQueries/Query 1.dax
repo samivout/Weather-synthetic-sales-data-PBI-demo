@@ -1,0 +1,15 @@
+// Welcome to DAX query view! Learn more about DAX queries at https://aka.ms/dax-queries.
+// Right-click on tables, columns, or measures in the data pane to access quick queries, or ask Copilot for help writing DAX.
+
+// Select "Run" to try this sample DAX query.
+EVALUATE
+    VAR TotalRevenue = 
+	CALCULATE(
+		SUMX(
+    		'sales_data',
+    		'sales_data'[sales] * RELATED('product_data'[product_price])
+	)
+	)
+
+RETURN
+ROW("Total revenue", TotalRevenue)

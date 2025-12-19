@@ -1,0 +1,53 @@
+table D_Product
+	lineageTag: 93dac2d2-d25b-44d4-89a4-6f6517b84dd0
+
+	column product_id
+		dataType: int64
+		formatString: 0
+		lineageTag: 5d80a8a4-3c99-4694-8d72-fe0feaa16faa
+		summarizeBy: none
+		sourceColumn: product_id
+
+		annotation SummarizationSetBy = Automatic
+
+	column Product
+		dataType: string
+		lineageTag: f6952ede-6c87-46f8-b3d4-28cdb6ed2348
+		summarizeBy: none
+		sourceColumn: Product
+
+		annotation SummarizationSetBy = Automatic
+
+	column product_price
+		dataType: double
+		formatString: \$#,0.###############;(\$#,0.###############);\$#,0.###############
+		lineageTag: c0e62efa-6b72-4ff0-b340-879a995d0fbf
+		summarizeBy: sum
+		sourceColumn: product_price
+
+		annotation SummarizationSetBy = Automatic
+
+	column category_id
+		dataType: int64
+		formatString: 0
+		lineageTag: 99b39b8b-a667-44ee-a683-ee0fc86e2d45
+		summarizeBy: none
+		sourceColumn: category_id
+
+		annotation SummarizationSetBy = Automatic
+
+	partition D_Product = m
+		mode: import
+		source =
+				let
+				    Source = Parquet.Document(File.Contents("file:///C:/dev/data/delta/test_product_data_latest.parquet"), [Compression=null, LegacyColumnNameEncoding=false, MaxDepth=null]),
+				    #"Renamed Columns" = Table.RenameColumns(Source,{{"product_name", "Product"}})
+				in
+				    #"Renamed Columns"
+
+	changedProperty = Name
+
+	annotation PBI_NavigationStepName = Navigation
+
+	annotation PBI_ResultType = Table
+

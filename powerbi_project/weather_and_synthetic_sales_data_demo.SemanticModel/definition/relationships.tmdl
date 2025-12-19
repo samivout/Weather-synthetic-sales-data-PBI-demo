@@ -1,0 +1,41 @@
+relationship AutoDetected_a235b5d1-06ef-4104-8434-63efae819c15
+	fromColumn: F_Sales.person_id
+	toColumn: D_Salesperson.person_id
+
+relationship AutoDetected_7e05f746-2bbd-44d9-a822-685baf4ff0f9
+	fromColumn: F_Sales.location_id
+	toColumn: D_Location.location_id
+
+relationship AutoDetected_df75be99-7e2e-494c-9b9d-6433d0dffa7b
+	isActive: false
+	fromColumn: D_Salesperson.location_id
+	toColumn: D_Location.location_id
+
+relationship AutoDetected_ac73ba1b-662d-46bb-b05c-269a234279c9
+	fromColumn: F_Product_Location.location_id
+	toColumn: D_Location.location_id
+
+relationship AutoDetected_dc80386c-1230-4f08-9948-e72a7079ba62
+	fromColumn: F_Sales.product_id
+	toColumn: D_Product.product_id
+
+relationship AutoDetected_917af02c-f018-4d8e-888d-f26ec8d51ba3
+	fromColumn: F_Product_Location.product_id
+	toColumn: D_Product.product_id
+
+relationship AutoDetected_f542faa8-0486-4e7f-8b62-8a0687a6d98f
+	fromColumn: D_Product.category_id
+	toColumn: D_Product_Category.category_id
+
+relationship 883d199b-8f03-3f09-f09b-8d5607e4aca4
+	fromColumn: F_Sales.Hour
+	toColumn: D_Time.Hour
+
+relationship 1247b50d-0fef-d967-1196-6260dc86bd19
+	fromColumn: F_Sales.BinID
+	toColumn: D_Weather_Index_Bins.BinID
+
+relationship a551fc4e-3fae-e848-d003-2a3105c4ff64
+	fromColumn: F_Sales.Date
+	toColumn: D_Date.Date
+
