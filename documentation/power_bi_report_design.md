@@ -21,6 +21,10 @@ The weather data is merged into the sales data table to make the model be focuse
 
 This section lists any special noteworthy remarks, at least through the eyes of a fresh Power BI developer, about the report design.
 
+### Semantic model
+
+The semantic model follows a standard star-schema with dimension tables being linked by one-to-many relationships to the main fact table. The main fact table has one special feature in that it consists of both the sales data and weather data. I elected to merge the weather data into the sales data despite the duplicate dimensions from salespeople and products for each location. I found that this resulted in easier DAX expressions and filtering than storing them to a separate table as one of the main analysis subjects in the report is how the sales are related to weather conditions.
+
 ### Calculation groups
 
 In many measures I ran into the issue of having copy-pasted the exact same filter pattern over binned data for an underlying measure. The software developer in me wanted to find a way to centralize the definition of this recurring filter. The solution came in the form of calculation groups, which allow defining a filter pattern where the measure it is used on is left as a parameter. Then in the report a developer can call within a `CALCULATE` function the measure the need and then use the calculation group's calculation item to utilize the now reusable filter.

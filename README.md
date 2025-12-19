@@ -7,7 +7,8 @@ This repository contains a demo project that utilizes Python and Power BI. The p
 
 Additionally, there are the
 
-- `documentation` directory containing docs related to both the Python package and the Power BI report.
+- `documentation` directory containing docs related to both the Python package and the Power BI report. Of special 
+  note is `power_bi_report_pages.md`, which contains supporting documentation for the Power BI report itself. 
 - `tests` directory for the PyTest tests. These are split into unit tests focusing on functionality of individual elements, integration tests focusing on collective functionality of certain systems and finally end-to-end tests that verify the functionality of the package as a whole at a high level.
 - `scripts` directory contains is dedicated to any scripts to use with the project. The notebooks directory contains the Jupytext-based .py files which are used to generate their paired notebook files. The notebook files themselves are not tracked in version control.
 - `dev_tools` directory contains small helpful developer utilities.
